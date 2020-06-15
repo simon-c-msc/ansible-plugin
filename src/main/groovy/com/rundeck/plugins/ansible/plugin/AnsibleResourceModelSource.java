@@ -29,10 +29,10 @@ import java.util.*;
 public class AnsibleResourceModelSource implements ResourceModelSource {
 
   private Framework framework;
-  
+
   private String project;
   private String sshAuthType;
-  
+
   private HashMap<String, Map<String, String>> configDataContext;
   private Map<String, Map<String, String>> executionDataContext;
 
@@ -99,20 +99,20 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
     inventory = resolveProperty(AnsibleDescribable.ANSIBLE_INVENTORY,null,configuration,executionDataContext);
     gatherFacts = "true".equals(resolveProperty(AnsibleDescribable.ANSIBLE_GATHER_FACTS,null,configuration,executionDataContext));
     ignoreErrors = "true".equals(resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_ERRORS,null,configuration,executionDataContext));
-    
+
     limit = (String) resolveProperty(AnsibleDescribable.ANSIBLE_LIMIT,null,configuration,executionDataContext);
     ignoreTagPrefix = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_TAGS,null,configuration,executionDataContext);
 
     extraTag = (String) resolveProperty(AnsibleDescribable.ANSIBLE_EXTRA_TAG,null,configuration,executionDataContext);
-    
+
     sshAuthType = resolveProperty(AnsibleDescribable.ANSIBLE_SSH_AUTH_TYPE,AuthenticationType.privateKey.name(),configuration,executionDataContext);
-    
+
     sshUser = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_USER,null,configuration,executionDataContext);
 
     sshPrivateKeyFile = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_KEYPATH,null,configuration,executionDataContext);
 
     sshPassword = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_PASSWORD,null,configuration,executionDataContext);
-    
+
     sshTimeout = null;
     String str_sshTimeout = resolveProperty(AnsibleDescribable.ANSIBLE_SSH_TIMEOUT,null,configuration,executionDataContext);
     if ( str_sshTimeout != null ) {
@@ -122,7 +122,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           throw new ConfigurationException("Can't parse timeout value : " + e.getMessage());
        }
     }
-    
+
     become = "true".equals( resolveProperty(AnsibleDescribable.ANSIBLE_BECOME,null,configuration,executionDataContext) );
     becomeMethod = (String) resolveProperty(AnsibleDescribable.ANSIBLE_BECOME_METHOD,null,configuration,executionDataContext);
     becomeUser = (String) resolveProperty(AnsibleDescribable.ANSIBLE_BECOME_USER,null,configuration,executionDataContext);
@@ -142,72 +142,72 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
   public AnsibleRunner buildAnsibleRunner() throws ResourceModelSourceException{
 
-	  AnsibleRunner runner = AnsibleRunner.playbookPath("gather-hosts.yml");
+    AnsibleRunner runner = AnsibleRunner.playbookPath("gather-hosts.yml");
 
-	  if ("true".equals(System.getProperty("ansible.debug"))) {
-		  runner.debug();
-	  }
+    if ("true".equals(System.getProperty("ansible.debug"))) {
+      runner.debug();
+    }
 
-	  if (limit != null && limit.length() > 0) {
-		  List<String> limitList = new ArrayList<>();
-		  limitList.add(limit);
-		  runner.limit(limitList);
-	  }
-	  
-		  if ( sshAuthType.equalsIgnoreCase(AuthenticationType.privateKey.name()) ) {
-			  if (sshPrivateKeyFile != null) {
-				  String sshPrivateKey;
-				  try {
-					  sshPrivateKey = new String(Files.readAllBytes(Paths.get(sshPrivateKeyFile)));
-				  } catch (IOException e) {
-					  throw new ResourceModelSourceException("Could not read privatekey file " + sshPrivateKeyFile,e);
-				  }
-				  runner = runner.sshPrivateKey(sshPrivateKey);
-			  }
-		  } else if ( sshAuthType.equalsIgnoreCase(AuthenticationType.password.name()) ) {
-			  if (sshPassword != null) {
-				  runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
-			  }
-		  }
-	  
+    if (limit != null && limit.length() > 0) {
+      List<String> limitList = new ArrayList<>();
+      limitList.add(limit);
+      runner.limit(limitList);
+    }
 
-	  if (inventory != null) {
-		  runner = runner.setInventory(inventory);
-	  }
+      if ( sshAuthType.equalsIgnoreCase(AuthenticationType.privateKey.name()) ) {
+        if (sshPrivateKeyFile != null) {
+          String sshPrivateKey;
+          try {
+            sshPrivateKey = new String(Files.readAllBytes(Paths.get(sshPrivateKeyFile)));
+          } catch (IOException e) {
+            throw new ResourceModelSourceException("Could not read privatekey file " + sshPrivateKeyFile,e);
+          }
+          runner = runner.sshPrivateKey(sshPrivateKey);
+        }
+      } else if ( sshAuthType.equalsIgnoreCase(AuthenticationType.password.name()) ) {
+        if (sshPassword != null) {
+          runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
+        }
+      }
 
-	  if (ignoreErrors == true) {
-		  runner = runner.ignoreErrors(ignoreErrors);
-	  }
 
-	  if (sshUser != null) {
-		  runner = runner.sshUser(sshUser);
-	  }
-	  if (sshTimeout != null) {
-		  runner = runner.sshTimeout(sshTimeout);
-	  }
+    if (inventory != null) {
+      runner = runner.setInventory(inventory);
+    }
 
-	  if (become != null) {
-		  runner = runner.become(become);
-	  }
+    if (ignoreErrors == true) {
+      runner = runner.ignoreErrors(ignoreErrors);
+    }
 
-	  if (becomeUser != null) {
-		  runner = runner.becomeUser(becomeUser);
-	  }
+    if (sshUser != null) {
+      runner = runner.sshUser(sshUser);
+    }
+    if (sshTimeout != null) {
+      runner = runner.sshTimeout(sshTimeout);
+    }
 
-	  if (becomeMethod != null) {
-		  runner = runner.becomeMethod(becomeMethod);
-	  }
+    if (become != null) {
+      runner = runner.become(become);
+    }
 
-	  if (becomePassword != null) {
-		  runner = runner.becomePassword(becomePassword);
-	  }
+    if (becomeUser != null) {
+      runner = runner.becomeUser(becomeUser);
+    }
+
+    if (becomeMethod != null) {
+      runner = runner.becomeMethod(becomeMethod);
+    }
+
+    if (becomePassword != null) {
+      runner = runner.becomePassword(becomePassword);
+    }
 
       if (configFile != null) {
         runner = runner.configFile(configFile);
       }
 
       if(vaultPassword!=null) {
-	    runner.vaultPass(vaultPassword);
+      runner.vaultPass(vaultPassword);
       }
 
       if (vaultFile != null) {
@@ -220,14 +220,14 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
         runner.vaultPass(vaultPassword);
       }
       if (baseDirectoryPath != null) {
-	      runner.baseDirectory(baseDirectoryPath);
+        runner.baseDirectory(baseDirectoryPath);
       }
 
       if (extraParameters != null){
         runner.extraParams(extraParameters);
       }
 
-	  return runner;
+    return runner;
   }
 
 
@@ -260,7 +260,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
         .append("tmpdir: '")
         .append(tempDirectory.toFile().getAbsolutePath())
         .append("'");
-    
+
     runner.extraVars(args.toString());
 
     try {
@@ -308,13 +308,15 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           }
           node.setUsername(username);
 
+          // Add groups as tags, except ignored tag prefix
           HashSet<String> tags = new HashSet<>();
           for (JsonElement ele : root.getAsJsonArray("group_names")) {
             if (ignoreTagPrefix != null && ignoreTagPrefix.length() > 0 && ele.getAsString().startsWith(ignoreTagPrefix)) continue;
             tags.add(ele.getAsString());
           }
+          // Add extraTag to node
           if (extraTag != null && extraTag.length() > 0) {
-        	tags.add(extraTag);
+          tags.add(extraTag);
           }
           node.setTags(tags);
 
@@ -354,6 +356,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
             node.setOsVersion(root.get("ansible_kernel").getAsString());
           }
 
+          // Add Ansible interesting vars as node attributes
           // JSON-Path -> Attribute-Name
           Map<String, String> interestingItems = new HashMap<>();
 
@@ -430,6 +433,62 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
               }
             }
           }
+
+          // Add ALL vars as node attributes, except Ansible Special variables, as of Ansible 2.9
+          // https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
+          ArrayList<String> specialVarsList = new ArrayList<String>();
+          specialVarsList.add("ansible_become_user");
+          specialVarsList.add("ansible_become_pass");
+          specialVarsList.add("ansible_become_password");
+          specialVarsList.add("ansible_check_mode");
+          specialVarsList.add("ansible_connection");
+          specialVarsList.add("ansible_dependent_role_names");
+          specialVarsList.add("ansible_diff_mode");
+          specialVarsList.add("ansible_facts");
+          specialVarsList.add("ansible_forks");
+          specialVarsList.add("ansible_host");
+          specialVarsList.add("ansible_index_var");
+          specialVarsList.add("ansible_inventory_sources");
+          specialVarsList.add("ansible_limit");
+          specialVarsList.add("ansible_local");
+          specialVarsList.add("ansible_loop");
+          specialVarsList.add("ansible_loop_var");
+          specialVarsList.add("ansible_parent_role_names");
+          specialVarsList.add("ansible_parent_role_paths");
+          specialVarsList.add("ansible_play_batch");
+          specialVarsList.add("ansible_play_hosts");
+          specialVarsList.add("ansible_play_hosts_all");
+          specialVarsList.add("ansible_play_name");
+          specialVarsList.add("ansible_play_role_names");
+          specialVarsList.add("ansible_playbook_python");
+          specialVarsList.add("ansible_python_interpreter");
+          specialVarsList.add("ansible_role_names");
+          specialVarsList.add("ansible_run_tags");
+          specialVarsList.add("ansible_search_path");
+          specialVarsList.add("ansible_ssh_pass");
+          specialVarsList.add("ansible_skip_tags");
+          specialVarsList.add("ansible_user");
+          specialVarsList.add("ansible_verbosity");
+          specialVarsList.add("ansible_version");
+          // TODO: allow .startsWith("ansible_*") filter
+          specialVarsList.add("discovered_interpreter_python");
+          specialVarsList.add("facts");   // used to gather host_vars
+          specialVarsList.add("gather_subset");
+          specialVarsList.add("group_names");
+          specialVarsList.add("groups");
+          specialVarsList.add("hostvars");
+          specialVarsList.add("inventory_dir");
+          specialVarsList.add("inventory_file");
+          specialVarsList.add("inventory_hostname");
+          specialVarsList.add("inventory_hostname_short");
+          specialVarsList.add("module_setup");
+          specialVarsList.add("omit");
+          specialVarsList.add("play_hosts");
+          specialVarsList.add("playbook_dir");
+          specialVarsList.add("role_name");
+          specialVarsList.add("role_names");
+          specialVarsList.add("role_path");
+          specialVarsList.add("tmpdir");  // used to gather host_vars
 
           nodes.putNode(node);
         }

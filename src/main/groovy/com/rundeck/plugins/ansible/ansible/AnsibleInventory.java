@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AnsibleInventory {
-  
+
   public class AnsibleInventoryHosts {
-    
+
     protected Map<String, Map<String, String>> hosts = new HashMap<String, Map<String, String>>();
     protected Map<String, AnsibleInventoryHosts> children = new HashMap<String, AnsibleInventoryHosts>();
-  
+
     public AnsibleInventoryHosts addHost(String nodeName) {
       hosts.put(nodeName, new HashMap<String, String>());
       return this;

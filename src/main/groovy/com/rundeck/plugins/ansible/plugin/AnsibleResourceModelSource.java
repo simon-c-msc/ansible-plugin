@@ -435,40 +435,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           // Add ALL vars as node attributes, except Ansible Special variables, as of Ansible 2.9
           // https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
           ArrayList<String> specialVarsList = new ArrayList<String>();
-          specialVarsList.add("ansible_become_user");
-          specialVarsList.add("ansible_become_pass");
-          specialVarsList.add("ansible_become_password");
-          specialVarsList.add("ansible_check_mode");
-          specialVarsList.add("ansible_connection");
-          specialVarsList.add("ansible_dependent_role_names");
-          specialVarsList.add("ansible_diff_mode");
-          specialVarsList.add("ansible_facts");
-          specialVarsList.add("ansible_forks");
-          specialVarsList.add("ansible_host");
-          specialVarsList.add("ansible_index_var");
-          specialVarsList.add("ansible_inventory_sources");
-          specialVarsList.add("ansible_limit");
-          specialVarsList.add("ansible_local");
-          specialVarsList.add("ansible_loop");
-          specialVarsList.add("ansible_loop_var");
-          specialVarsList.add("ansible_parent_role_names");
-          specialVarsList.add("ansible_parent_role_paths");
-          specialVarsList.add("ansible_play_batch");
-          specialVarsList.add("ansible_play_hosts");
-          specialVarsList.add("ansible_play_hosts_all");
-          specialVarsList.add("ansible_play_name");
-          specialVarsList.add("ansible_play_role_names");
-          specialVarsList.add("ansible_playbook_python");
-          specialVarsList.add("ansible_python_interpreter");
-          specialVarsList.add("ansible_role_names");
-          specialVarsList.add("ansible_run_tags");
-          specialVarsList.add("ansible_search_path");
-          specialVarsList.add("ansible_ssh_pass");
-          specialVarsList.add("ansible_skip_tags");
-          specialVarsList.add("ansible_user");
-          specialVarsList.add("ansible_verbosity");
-          specialVarsList.add("ansible_version");
-          // TODO: allow .startsWith("ansible_*") filter
+          specialVarsList.add("ansible_");
           specialVarsList.add("discovered_interpreter_python");
           specialVarsList.add("facts");   // used to gather host_vars
           specialVarsList.add("gather_subset");
@@ -490,11 +457,14 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
           Gson gson = new Gson();
           String hostVarJsonString ;
+          hostVarsLoop:
           for (String hostVar : root.keySet()) {
             // don't add Ansible special vars
-            if (specialVarsList.contains(hostVar)) {
-              // System.out.println("Node '" + hostname +"': ignore special var '" + hostVar +"'");
-              continue;
+            for (String specialVarString : specialVarsList) {
+              if (hostVar.startsWith(specialVarString)) {
+                // System.out.println("Node '" + hostname +"': ignore special var '" + hostVar +"'");
+                continue hostVarsLoop;
+              }
             }
             if (root.get(hostVar).isJsonPrimitive()) {
               // System.out.println("Node '" + hostname +"': Add Attribute '" + hostVar +"':'" + root.get(hostVar).getAsString() +"'");
@@ -505,7 +475,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
                 " as JsonString");
               hostVarJsonString = gson.toJson(root.get(hostVar)) ;
               if (hostVarJsonString != null) {
-                System.out.println( hostVarJsonString );
+                System.out.println( "  " + hostVarJsonString );
                 node.setAttribute(hostVar, hostVarJsonString);
               }
             }

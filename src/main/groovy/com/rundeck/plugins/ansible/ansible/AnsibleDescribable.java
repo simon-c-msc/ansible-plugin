@@ -271,6 +271,14 @@ public interface AnsibleDescribable extends Describable {
             ""
     );
 
+    public static Property IMPORT_INVENTORY_VARS_PROP = PropertyUtil.bool(
+            ANSIBLE_IMPORT_INVENTORY_VARS,
+            "Import host vars",
+            "Adds all inventory host variables as node's attributes",
+            true,
+            "false"
+    );
+
     static final Property EXTRA_VARS_PROP = PropertyBuilder.builder()
             .string(ANSIBLE_EXTRA_VARS)
             .required(false)

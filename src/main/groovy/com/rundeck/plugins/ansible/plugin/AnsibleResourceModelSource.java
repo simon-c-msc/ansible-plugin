@@ -154,21 +154,21 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
       runner.limit(limitList);
     }
 
-      if ( sshAuthType.equalsIgnoreCase(AuthenticationType.privateKey.name()) ) {
-        if (sshPrivateKeyFile != null) {
-          String sshPrivateKey;
-          try {
-            sshPrivateKey = new String(Files.readAllBytes(Paths.get(sshPrivateKeyFile)));
-          } catch (IOException e) {
-            throw new ResourceModelSourceException("Could not read privatekey file " + sshPrivateKeyFile,e);
-          }
-          runner = runner.sshPrivateKey(sshPrivateKey);
+    if ( sshAuthType.equalsIgnoreCase(AuthenticationType.privateKey.name()) ) {
+      if (sshPrivateKeyFile != null) {
+        String sshPrivateKey;
+        try {
+          sshPrivateKey = new String(Files.readAllBytes(Paths.get(sshPrivateKeyFile)));
+        } catch (IOException e) {
+          throw new ResourceModelSourceException("Could not read privatekey file " + sshPrivateKeyFile,e);
         }
-      } else if ( sshAuthType.equalsIgnoreCase(AuthenticationType.password.name()) ) {
-        if (sshPassword != null) {
-          runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
-        }
+        runner = runner.sshPrivateKey(sshPrivateKey);
       }
+    } else if ( sshAuthType.equalsIgnoreCase(AuthenticationType.password.name()) ) {
+      if (sshPassword != null) {
+        runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
+      }
+    }
 
 
     if (inventory != null) {
@@ -438,7 +438,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           ArrayList<String> specialVarsList = new ArrayList<String>();
           specialVarsList.add("ansible_");  // most ansible vars prefix
           specialVarsList.add("discovered_interpreter_python");
-          specialVarsList.add("facts");   // rundeck used to gather host_vars
+          specialVarsList.add("facts");   // rundeck used to gather host_vars 
           specialVarsList.add("gather_subset");
           specialVarsList.add("group_names");
           specialVarsList.add("groups");
@@ -454,23 +454,22 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           specialVarsList.add("role_name");
           specialVarsList.add("role_names");
           specialVarsList.add("role_path");
-          specialVarsList.add("tmpdir");  // rundeck used to gather host_vars
+          specialVarsList.add("tmpdir");  // rundeck used to gather host_vars 
 
-          Gson gson = new Gson();
-          String hostVarJsonString ;
-          hostVarsLoop:
-          for (String hostVar : root.keySet()) {
-            // skip Ansible special vars
-            for (String specialVarString : specialVarsList) {
-              if (hostVar.startsWith(specialVarString)) continue hostVarsLoop;
-            }
+            hostVarsLoop:
+            for (String hostVar : root.keySet()) {
+              // skip Ansible special vars
+              for (String specialVarString : specialVarsList) {
+                if (hostVar.startsWith(specialVarString)) continue hostVarsLoop;
+              }
 
-            if (root.get(hostVar).isJsonPrimitive()) {
-              // Keep attribute as String, don't serialize as Json
-              node.setAttribute(hostVar, root.get(hostVar).getAsString());
-            } else {
-              // Serialize attribute as Json (JsonArray or JsonObject)
-              node.setAttribute(hostVar, new Gson().toJson(root.get(hostVar)));
+              if (root.get(hostVar).isJsonPrimitive()) {
+                // Keep attribute as String, don't serialize as Json
+                node.setAttribute(hostVar, root.get(hostVar).getAsString());
+              } else {
+                // Serialize attribute as Json (JsonArray or JsonObject)
+                node.setAttribute(hostVar, new Gson().toJson(root.get(hostVar)));
+              }
             }
           }
 

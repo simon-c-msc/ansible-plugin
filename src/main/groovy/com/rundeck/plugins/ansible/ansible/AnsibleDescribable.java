@@ -108,6 +108,7 @@ public interface AnsibleDescribable extends Describable {
     public static final String ANSIBLE_LIMIT = "ansible-limit";
     public static final String ANSIBLE_DISABLE_LIMIT ="ansible-disable-limit";
     public static final String ANSIBLE_IGNORE_TAGS = "ansible-ignore-tags-prefix";
+    public static final String ANSIBLE_IMPORT_INVENTORY_VARS = "ansible-import-inventory-vars";
     public static final String ANSIBLE_EXTRA_VARS = "ansible-extra-vars";
     public static final String ANSIBLE_EXTRA_PARAM = "ansible-extra-param";
     public static final String ANSIBLE_VAULT_PATH = "ansible-vault-path";
@@ -269,6 +270,14 @@ public interface AnsibleDescribable extends Describable {
             "This tag will be added to all hosts discovered by this source.",
             false,
             ""
+    );
+
+    public static Property IMPORT_INVENTORY_VARS_PROP = PropertyUtil.bool(
+            ANSIBLE_IMPORT_INVENTORY_VARS,
+            "Import host vars",
+            "Adds all inventory host variables as node's attributes",
+            true,
+            "false"
     );
 
     static final Property EXTRA_VARS_PROP = PropertyBuilder.builder()

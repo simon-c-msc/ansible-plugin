@@ -42,6 +42,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
   private String limit;
   private String ignoreTagPrefix;
   private String extraTag;
+  private boolean importInventoryVars;
 
   protected String vaultPass;
   protected Boolean debug = false;
@@ -103,6 +104,8 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
     limit = (String) resolveProperty(AnsibleDescribable.ANSIBLE_LIMIT,null,configuration,executionDataContext);
     ignoreTagPrefix = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_TAGS,null,configuration,executionDataContext);
 
+    importInventoryVars = "true".equals(resolveProperty(AnsibleDescribable.ANSIBLE_IMPORT_INVENTORY_VARS,null,configuration,executionDataContext));
+
     extraTag = (String) resolveProperty(AnsibleDescribable.ANSIBLE_EXTRA_TAG,null,configuration,executionDataContext);
 
     sshAuthType = resolveProperty(AnsibleDescribable.ANSIBLE_SSH_AUTH_TYPE,AuthenticationType.privateKey.name(),configuration,executionDataContext);
@@ -154,21 +157,21 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
       runner.limit(limitList);
     }
 
-      if ( sshAuthType.equalsIgnoreCase(AuthenticationType.privateKey.name()) ) {
-        if (sshPrivateKeyFile != null) {
-          String sshPrivateKey;
-          try {
-            sshPrivateKey = new String(Files.readAllBytes(Paths.get(sshPrivateKeyFile)));
-          } catch (IOException e) {
-            throw new ResourceModelSourceException("Could not read privatekey file " + sshPrivateKeyFile,e);
-          }
-          runner = runner.sshPrivateKey(sshPrivateKey);
+    if ( sshAuthType.equalsIgnoreCase(AuthenticationType.privateKey.name()) ) {
+      if (sshPrivateKeyFile != null) {
+        String sshPrivateKey;
+        try {
+          sshPrivateKey = new String(Files.readAllBytes(Paths.get(sshPrivateKeyFile)));
+        } catch (IOException e) {
+          throw new ResourceModelSourceException("Could not read privatekey file " + sshPrivateKeyFile,e);
         }
-      } else if ( sshAuthType.equalsIgnoreCase(AuthenticationType.password.name()) ) {
-        if (sshPassword != null) {
-          runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
-        }
+        runner = runner.sshPrivateKey(sshPrivateKey);
       }
+    } else if ( sshAuthType.equalsIgnoreCase(AuthenticationType.password.name()) ) {
+      if (sshPassword != null) {
+        runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
+      }
+    }
 
 
     if (inventory != null) {
@@ -433,44 +436,45 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
             }
           }
 
-          // Add ALL vars as node attributes, except Ansible Special variables, as of Ansible 2.9
-          // https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
-          ArrayList<String> specialVarsList = new ArrayList<String>();
-          specialVarsList.add("ansible_");  // most ansible vars prefix
-          specialVarsList.add("discovered_interpreter_python");
-          specialVarsList.add("facts");   // rundeck used to gather host_vars
-          specialVarsList.add("gather_subset");
-          specialVarsList.add("group_names");
-          specialVarsList.add("groups");
-          specialVarsList.add("hostvars");
-          specialVarsList.add("inventory_dir");
-          specialVarsList.add("inventory_file");
-          specialVarsList.add("inventory_hostname");
-          specialVarsList.add("inventory_hostname_short");
-          specialVarsList.add("module_setup");
-          specialVarsList.add("omit");
-          specialVarsList.add("play_hosts");
-          specialVarsList.add("playbook_dir");
-          specialVarsList.add("role_name");
-          specialVarsList.add("role_names");
-          specialVarsList.add("role_path");
-          specialVarsList.add("tmpdir");  // rundeck used to gather host_vars
 
-          Gson gson = new Gson();
-          String hostVarJsonString ;
-          hostVarsLoop:
-          for (String hostVar : root.keySet()) {
-            // skip Ansible special vars
-            for (String specialVarString : specialVarsList) {
-              if (hostVar.startsWith(specialVarString)) continue hostVarsLoop;
-            }
+          if (importInventoryVars == true) {
+            // Add ALL vars as node attributes, except Ansible Special variables, as of Ansible 2.9
+            // https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
+            ArrayList<String> specialVarsList = new ArrayList<String>();
+            specialVarsList.add("ansible_");  // most ansible vars prefix
+            specialVarsList.add("discovered_interpreter_python");
+            specialVarsList.add("facts");   // rundeck used to gather host_vars
+            specialVarsList.add("gather_subset");
+            specialVarsList.add("group_names");
+            specialVarsList.add("groups");
+            specialVarsList.add("hostvars");
+            specialVarsList.add("inventory_dir");
+            specialVarsList.add("inventory_file");
+            specialVarsList.add("inventory_hostname");
+            specialVarsList.add("inventory_hostname_short");
+            specialVarsList.add("module_setup");
+            specialVarsList.add("omit");
+            specialVarsList.add("play_hosts");
+            specialVarsList.add("playbook_dir");
+            specialVarsList.add("role_name");
+            specialVarsList.add("role_names");
+            specialVarsList.add("role_path");
+            specialVarsList.add("tmpdir");  // rundeck used to gather host_vars
 
-            if (root.get(hostVar).isJsonPrimitive()) {
-              // Keep attribute as String, don't serialize as Json
-              node.setAttribute(hostVar, root.get(hostVar).getAsString());
-            } else {
-              // Serialize attribute as Json (JsonArray or JsonObject)
-              node.setAttribute(hostVar, new Gson().toJson(root.get(hostVar)));
+            hostVarsLoop:
+            for (String hostVar : root.keySet()) {
+              // skip Ansible special vars
+              for (String specialVarString : specialVarsList) {
+                if (hostVar.startsWith(specialVarString)) continue hostVarsLoop;
+              }
+
+              if (root.get(hostVar).isJsonPrimitive()) {
+                // Keep attribute as String, don't serialize as Json
+                node.setAttribute(hostVar, root.get(hostVar).getAsString());
+              } else {
+                // Serialize attribute as Json (JsonArray or JsonObject)
+                node.setAttribute(hostVar, new Gson().toJson(root.get(hostVar)));
+              }
             }
           }
 

@@ -292,10 +292,9 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           }catch(Exception ex){
             System.out.println("[warn] Problem getting the ansible_host attribute from node " + hostname);
           }
+          node.setHostname(hostname);
 
           String nodename = root.get("inventory_hostname").getAsString();
-
-          node.setHostname(hostname);
           node.setNodename(nodename);
 
           String username = sshUser; // Use sshUser as default username
@@ -316,7 +315,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           }
           // Add extraTag to node
           if (extraTag != null && extraTag.length() > 0) {
-          tags.add(extraTag);
+            tags.add(extraTag);
           }
           node.setTags(tags);
 
@@ -437,9 +436,9 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           // Add ALL vars as node attributes, except Ansible Special variables, as of Ansible 2.9
           // https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
           ArrayList<String> specialVarsList = new ArrayList<String>();
-          specialVarsList.add("ansible_");
+          specialVarsList.add("ansible_");  // most ansible vars prefix
           specialVarsList.add("discovered_interpreter_python");
-          specialVarsList.add("facts");   // used to gather host_vars
+          specialVarsList.add("facts");   // rundeck used to gather host_vars
           specialVarsList.add("gather_subset");
           specialVarsList.add("group_names");
           specialVarsList.add("groups");
@@ -455,31 +454,23 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           specialVarsList.add("role_name");
           specialVarsList.add("role_names");
           specialVarsList.add("role_path");
-          specialVarsList.add("tmpdir");  // used to gather host_vars
+          specialVarsList.add("tmpdir");  // rundeck used to gather host_vars
 
           Gson gson = new Gson();
           String hostVarJsonString ;
           hostVarsLoop:
           for (String hostVar : root.keySet()) {
-            // don't add Ansible special vars
+            // skip Ansible special vars
             for (String specialVarString : specialVarsList) {
-              if (hostVar.startsWith(specialVarString)) {
-                // System.out.println("Node '" + hostname +"': ignore special var '" + hostVar +"'");
-                continue hostVarsLoop;
-              }
+              if (hostVar.startsWith(specialVarString)) continue hostVarsLoop;
             }
+
             if (root.get(hostVar).isJsonPrimitive()) {
-              // System.out.println("Node '" + hostname +"': Add Attribute '" + hostVar +"':'" + root.get(hostVar).getAsString() +"'");
+              // Keep attribute as String, don't serialize as Json
               node.setAttribute(hostVar, root.get(hostVar).getAsString());
             } else {
-              // hostVar is not a Primitive: JsonArray or JsonObject
-              System.out.println("Node '" + hostname +"': Adding Attribute '" + hostVar +"' " + root.get(hostVar).getClass() +
-                " as JsonString");
-              hostVarJsonString = new Gson().toJson(root.get(hostVar)) ;
-              if (hostVarJsonString != null) {
-                System.out.println( "  " + hostVarJsonString );
-                node.setAttribute(hostVar, hostVarJsonString);
-              }
+              // Serialize attribute as Json (JsonArray or JsonObject)
+              node.setAttribute(hostVar, new Gson().toJson(root.get(hostVar)));
             }
           }
 

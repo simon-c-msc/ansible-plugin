@@ -43,6 +43,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
   private String ignoreTagPrefix;
   private String extraTag;
   private boolean importInventoryVars;
+  private String ignoreInventoryVars;
 
   protected String vaultPass;
   protected Boolean debug = false;
@@ -103,8 +104,9 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
     limit = (String) resolveProperty(AnsibleDescribable.ANSIBLE_LIMIT,null,configuration,executionDataContext);
     ignoreTagPrefix = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_TAGS,null,configuration,executionDataContext);
-
+    
     importInventoryVars = "true".equals(resolveProperty(AnsibleDescribable.ANSIBLE_IMPORT_INVENTORY_VARS,null,configuration,executionDataContext));
+    ignoreInventoryVars = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_INVENTORY_VARS,null,configuration,executionDataContext);
 
     extraTag = (String) resolveProperty(AnsibleDescribable.ANSIBLE_EXTRA_TAG,null,configuration,executionDataContext);
 
@@ -461,6 +463,13 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
             specialVarsList.add("role_path");
             specialVarsList.add("tmpdir");  // rundeck used to gather host_vars
 
+            if (ignoreInventoryVars != null && ignoreInventoryVars.length() > 0) {
+              String[] ignoreInventoryVarsStrings = ignoreInventoryVars.split(",");
+              for (String ignoreInventoryVarsString: ignoreInventoryVarsStrings) {
+                specialVarsList.add(ignoreInventoryVarsString.trim());
+              }
+            }
+            
             hostVarsLoop:
             for (String hostVar : root.keySet()) {
               // skip Ansible special vars

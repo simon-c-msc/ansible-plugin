@@ -42,6 +42,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
   private String limit;
   private String ignoreTagPrefix;
   private String extraTag;
+  private boolean importInventoryVars;
 
   protected String vaultPass;
   protected Boolean debug = false;
@@ -102,6 +103,8 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
     limit = (String) resolveProperty(AnsibleDescribable.ANSIBLE_LIMIT,null,configuration,executionDataContext);
     ignoreTagPrefix = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_TAGS,null,configuration,executionDataContext);
+
+    importInventoryVars = "true".equals(resolveProperty(AnsibleDescribable.ANSIBLE_IMPORT_INVENTORY_VARS,null,configuration,executionDataContext));
 
     extraTag = (String) resolveProperty(AnsibleDescribable.ANSIBLE_EXTRA_TAG,null,configuration,executionDataContext);
 
@@ -433,28 +436,37 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
             }
           }
 
-          // Add ALL vars as node attributes, except Ansible Special variables, as of Ansible 2.9
-          // https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
-          ArrayList<String> specialVarsList = new ArrayList<String>();
-          specialVarsList.add("ansible_");  // most ansible vars prefix
-          specialVarsList.add("discovered_interpreter_python");
-          specialVarsList.add("facts");   // rundeck used to gather host_vars 
-          specialVarsList.add("gather_subset");
-          specialVarsList.add("group_names");
-          specialVarsList.add("groups");
-          specialVarsList.add("hostvars");
-          specialVarsList.add("inventory_dir");
-          specialVarsList.add("inventory_file");
-          specialVarsList.add("inventory_hostname");
-          specialVarsList.add("inventory_hostname_short");
-          specialVarsList.add("module_setup");
-          specialVarsList.add("omit");
-          specialVarsList.add("play_hosts");
-          specialVarsList.add("playbook_dir");
-          specialVarsList.add("role_name");
-          specialVarsList.add("role_names");
-          specialVarsList.add("role_path");
-          specialVarsList.add("tmpdir");  // rundeck used to gather host_vars 
+
+          if (importInventoryVars == true) {
+            // Add ALL vars as node attributes, except Ansible Special variables, as of Ansible 2.9
+            // https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
+            ArrayList<String> specialVarsList = new ArrayList<String>();
+            specialVarsList.add("ansible_");  // most ansible vars prefix
+            specialVarsList.add("discovered_interpreter_python");
+            specialVarsList.add("facts");   // rundeck used to gather host_vars 
+            specialVarsList.add("gather_subset");
+            specialVarsList.add("group_names");
+            specialVarsList.add("groups");
+            specialVarsList.add("hostvars");
+            specialVarsList.add("inventory_dir");
+            specialVarsList.add("inventory_file");
+            specialVarsList.add("inventory_hostname");
+            specialVarsList.add("inventory_hostname_short");
+            specialVarsList.add("module_setup");
+            specialVarsList.add("omit");
+            specialVarsList.add("play_hosts");
+            specialVarsList.add("playbook_dir");
+            specialVarsList.add("role_name");
+            specialVarsList.add("role_names");
+            specialVarsList.add("role_path");
+            specialVarsList.add("tmpdir");  // rundeck used to gather host_vars 
+
+            if (ignoreInventoryVars != null && ignoreInventoryVars.length() > 0) {
+              String[] ignoreInventoryVarsStrings = ignoreInventoryVars.split(",");
+              for (String ignoreInventoryVarsString: ignoreInventoryVarsStrings) {
+                specialVarsList.add(ignoreInventoryVarsString.trim());
+              }
+            }
 
             hostVarsLoop:
             for (String hostVar : root.keySet()) {

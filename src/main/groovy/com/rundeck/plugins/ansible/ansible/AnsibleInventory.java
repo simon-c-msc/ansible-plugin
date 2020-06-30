@@ -3,6 +3,7 @@ package com.rundeck.plugins.ansible.ansible;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -28,25 +29,24 @@ public class AnsibleInventory {
       Map<String, JsonElement> attributesJson = new HashMap<String, JsonElement>();
 
       // Add ALL node attributes as inventory host variables
-      for (String attribute : attributes.keySet()) {
+      for (Entry<String, String> attribute : attributes.entrySet() ) {
         JsonElement json;
         try {
-          JsonReader reader = new JsonReader(new StringReader(attributes.get(attribute)));
+          JsonReader reader = new JsonReader(new StringReader(attribute.getValue()));
           reader.setLenient(true);
           json = new JsonParser().parse(reader);
         } catch (Exception e) {
           // cannot be parsed as Json. ie: /INT
-          System.out.println("Attribute '" + attribute + "' has invalid Json: '"+ attributes.get(attribute) + "'");
-          json = new JsonPrimitive(attributes.get(attribute)) ;
+          json = new JsonPrimitive(attribute.getValue()) ;
         }
         
         // avoid JsonParser truncate after ' ' or ','
         // attributes are not valid serialized Json
         if (json.isJsonPrimitive()) {
-          json = new JsonPrimitive(attributes.get(attribute)) ;
+          json = new JsonPrimitive(attribute.getValue()) ;
         }
 
-        attributesJson.put(attribute, json);
+        attributesJson.put(attribute.getKey(), json);
       }
 
       hosts.put(nodeName, attributesJson);

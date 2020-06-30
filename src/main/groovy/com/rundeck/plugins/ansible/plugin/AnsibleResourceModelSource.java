@@ -25,6 +25,7 @@ import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class AnsibleResourceModelSource implements ResourceModelSource {
 
@@ -86,6 +87,13 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
         } else {
           return defaultValue;
         }
+  }
+
+  private static Boolean skipVar(final String hostVar, final List<String> varList) {
+    for (final String specialVarString : varList) {
+      if (hostVar.startsWith(specialVarString)) return true;
+    }
+    return false;
   }
 
   public void configure(Properties configuration) throws ConfigurationException {
@@ -239,6 +247,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
   @Override
   public INodeSet getNodes() throws ResourceModelSourceException {
     NodeSetImpl nodes = new NodeSetImpl();
+    final Gson gson = new Gson();
 
     Path tempDirectory;
     try {
@@ -442,7 +451,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           if (importInventoryVars == true) {
             // Add ALL vars as node attributes, except Ansible Special variables, as of Ansible 2.9
             // https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
-            ArrayList<String> specialVarsList = new ArrayList<String>();
+            List<String> specialVarsList = new ArrayList<>();
             specialVarsList.add("ansible_");  // most ansible vars prefix
             specialVarsList.add("discovered_interpreter_python");
             specialVarsList.add("facts");   // rundeck used to gather host_vars
@@ -470,19 +479,20 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
               }
             }
             
-            hostVarsLoop:
-            for (String hostVar : root.keySet()) {
+            // for (String hostVar : root.keySet()) {
+            for (Entry<String, JsonElement> hostVar : root.entrySet()) {
+
               // skip Ansible special vars
-              for (String specialVarString : specialVarsList) {
-                if (hostVar.startsWith(specialVarString)) continue hostVarsLoop;
+              if (skipVar(hostVar.getKey(), specialVarsList)) {
+                continue;
               }
 
-              if (root.get(hostVar).isJsonPrimitive()) {
+              if (hostVar.getValue().isJsonPrimitive()) {
                 // Keep attribute as String, don't serialize as Json
-                node.setAttribute(hostVar, root.get(hostVar).getAsString());
+                node.setAttribute(hostVar.getKey(), hostVar.getValue().getAsString());
               } else {
                 // Serialize attribute as Json (JsonArray or JsonObject)
-                node.setAttribute(hostVar, new Gson().toJson(root.get(hostVar)));
+                node.setAttribute(hostVar.getKey(), gson.toJson(hostVar.getValue()));
               }
             }
           }

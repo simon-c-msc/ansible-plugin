@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -487,7 +488,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
                 continue;
               }
 
-              if (hostVar.getValue().isJsonPrimitive()) {
+              if (hostVar.getValue() instanceof JsonPrimitive && ((JsonPrimitive) hostVar.getValue()).isString()) {
                 // Keep attribute as String, don't serialize as Json
                 node.setAttribute(hostVar.getKey(), hostVar.getValue().getAsString());
               } else {

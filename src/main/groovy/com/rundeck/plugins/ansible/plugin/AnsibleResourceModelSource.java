@@ -43,6 +43,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
   private String ignoreTagPrefix;
   private String extraTag;
   private boolean importInventoryVars;
+  private String ignoreInventoryVars;
 
   protected String vaultPass;
   protected Boolean debug = false;
@@ -87,6 +88,13 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
         }
   }
 
+  private static Boolean skipVar(final String hostVar, final List<String> varList) {
+    for (final String specialVarString : varList) {
+      if (hostVar.startsWith(specialVarString)) return true;
+    }
+    return false;
+  }
+
   public void configure(Properties configuration) throws ConfigurationException {
 
     project = configuration.getProperty("project");
@@ -103,8 +111,9 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
     limit = (String) resolveProperty(AnsibleDescribable.ANSIBLE_LIMIT,null,configuration,executionDataContext);
     ignoreTagPrefix = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_TAGS,null,configuration,executionDataContext);
-
+    
     importInventoryVars = "true".equals(resolveProperty(AnsibleDescribable.ANSIBLE_IMPORT_INVENTORY_VARS,null,configuration,executionDataContext));
+    ignoreInventoryVars = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_INVENTORY_VARS,null,configuration,executionDataContext);
 
     extraTag = (String) resolveProperty(AnsibleDescribable.ANSIBLE_EXTRA_TAG,null,configuration,executionDataContext);
 
@@ -237,6 +246,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
   @Override
   public INodeSet getNodes() throws ResourceModelSourceException {
     NodeSetImpl nodes = new NodeSetImpl();
+    final Gson gson = new Gson();
 
     Path tempDirectory;
     try {
@@ -440,7 +450,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           if (importInventoryVars == true) {
             // Add ALL vars as node attributes, except Ansible Special variables, as of Ansible 2.9
             // https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
-            ArrayList<String> specialVarsList = new ArrayList<String>();
+            List<String> specialVarsList = new ArrayList<>();
             specialVarsList.add("ansible_");  // most ansible vars prefix
             specialVarsList.add("discovered_interpreter_python");
             specialVarsList.add("facts");   // rundeck used to gather host_vars 
@@ -467,20 +477,21 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
                 specialVarsList.add(ignoreInventoryVarsString.trim());
               }
             }
+            
+            // for (String hostVar : root.keySet()) {
+            for (Entry<String, JsonElement> hostVar : root.entrySet()) {
 
-            hostVarsLoop:
-            for (String hostVar : root.keySet()) {
               // skip Ansible special vars
-              for (String specialVarString : specialVarsList) {
-                if (hostVar.startsWith(specialVarString)) continue hostVarsLoop;
+              if (skipVar(hostVar.getKey(), specialVarsList)) {
+                continue;
               }
 
-              if (root.get(hostVar).isJsonPrimitive()) {
+              if (hostVar.getValue().isJsonPrimitive()) {
                 // Keep attribute as String, don't serialize as Json
-                node.setAttribute(hostVar, root.get(hostVar).getAsString());
+                node.setAttribute(hostVar.getKey(), hostVar.getValue().getAsString());
               } else {
                 // Serialize attribute as Json (JsonArray or JsonObject)
-                node.setAttribute(hostVar, new Gson().toJson(root.get(hostVar)));
+                node.setAttribute(hostVar.getKey(), gson.toJson(hostVar.getValue()));
               }
             }
           }

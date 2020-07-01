@@ -32,18 +32,10 @@ public class AnsibleInventory {
       for (Entry<String, String> attribute : attributes.entrySet() ) {
         JsonElement json;
         try {
-          JsonReader reader = new JsonReader(new StringReader(attribute.getValue()));
-          reader.setLenient(true);
-          json = new JsonParser().parse(reader);
+          json = new Gson().fromJson(attribute.getValue(), JsonElement.class);
         } catch (Exception e) {
-          // cannot be parsed as Json. ie: /INT
-          json = new JsonPrimitive(attribute.getValue()) ;
-        }
-        
-        // avoid JsonParser truncate after ' ' or ','
-        // attributes are not valid serialized Json
-        if (json.isJsonPrimitive()) {
-          json = new JsonPrimitive(attribute.getValue()) ;
+          // convert Strings as Primitive
+          json = new JsonPrimitive(attribute.getValue());
         }
 
         attributesJson.put(attribute.getKey(), json);

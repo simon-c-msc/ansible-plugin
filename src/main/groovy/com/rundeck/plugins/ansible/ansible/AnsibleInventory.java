@@ -32,9 +32,9 @@ public class AnsibleInventory {
       for (Entry<String, String> attribute : attributes.entrySet() ) {
         JsonElement json;
         try {
-          json = new Gson().fromJson(attribute.getValue(), JsonElement.class);
+          json = JsonParser.parseString(attribute.getValue());
         } catch (Exception e) {
-          // convert Strings as Primitive
+          // convert Strings to Primitives
           json = new JsonPrimitive(attribute.getValue());
         }
 

@@ -70,6 +70,8 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
   protected String baseDirectoryPath;
 
+  protected String ansibleBinariesDirectoryPath;
+
   protected String extraParameters;
 
   public AnsibleResourceModelSource(final Framework framework) {
@@ -113,7 +115,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
     limit = (String) resolveProperty(AnsibleDescribable.ANSIBLE_LIMIT,null,configuration,executionDataContext);
     ignoreTagPrefix = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_TAGS,null,configuration,executionDataContext);
-    
+
     importInventoryVars = "true".equals(resolveProperty(AnsibleDescribable.ANSIBLE_IMPORT_INVENTORY_VARS,null,configuration,executionDataContext));
     ignoreInventoryVars = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_INVENTORY_VARS,null,configuration,executionDataContext);
 
@@ -149,6 +151,8 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
     vaultPassword = (String) resolveProperty(AnsibleDescribable.ANSIBLE_VAULT_PASSWORD,null,configuration,executionDataContext);
 
     baseDirectoryPath = (String) resolveProperty(AnsibleDescribable.ANSIBLE_BASE_DIR_PATH,null,configuration,executionDataContext);
+
+    ansibleBinariesDirectoryPath = (String) resolveProperty(AnsibleDescribable.ANSIBLE_BINARIES_DIR_PATH, null, configuration, executionDataContext);
 
     extraParameters = (String)  resolveProperty(AnsibleDescribable.ANSIBLE_EXTRA_PARAM,null,configuration,executionDataContext);
 
@@ -234,7 +238,11 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
         runner.vaultPass(vaultPassword);
       }
       if (baseDirectoryPath != null) {
-        runner.baseDirectory(baseDirectoryPath);
+	      runner.baseDirectory(baseDirectoryPath);
+      }
+
+      if (ansibleBinariesDirectoryPath != null) {
+        runner.ansibleBinariesDirectory(ansibleBinariesDirectoryPath);
       }
 
       if (extraParameters != null){
@@ -479,7 +487,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
                 specialVarsList.add(ignoreInventoryVarsString.trim());
               }
             }
-            
+
             // for (String hostVar : root.keySet()) {
             for (Entry<String, JsonElement> hostVar : root.entrySet()) {
 

@@ -298,7 +298,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           node.setHostname(hostname);
           node.setNodename(nodename);
 
-          String username = System.getProperty("user.name"); // TODO better default?
+          String username = sshUser; // Use sshUser as default username
           if (root.has("ansible_user")) {
             username = root.get("ansible_user").getAsString();
           } else if (root.has("ansible_ssh_user")) { // deprecated variable

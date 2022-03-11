@@ -1,4 +1,4 @@
-package com.batix.rundeck.core;
+package com.rundeck.plugins.ansible.ansible;
 
 import java.util.Map;
 

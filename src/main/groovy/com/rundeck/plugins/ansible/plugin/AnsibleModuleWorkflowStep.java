@@ -1,9 +1,9 @@
-package com.batix.rundeck.plugins;
+package com.rundeck.plugins.ansible.plugin;
 
-import com.batix.rundeck.core.AnsibleDescribable;
-import com.batix.rundeck.core.AnsibleException;
-import com.batix.rundeck.core.AnsibleRunner;
-import com.batix.rundeck.core.AnsibleRunnerBuilder;
+import com.rundeck.plugins.ansible.ansible.AnsibleDescribable;
+import com.rundeck.plugins.ansible.ansible.AnsibleException;
+import com.rundeck.plugins.ansible.ansible.AnsibleRunner;
+import com.rundeck.plugins.ansible.ansible.AnsibleRunnerBuilder;
 import com.dtolabs.rundeck.core.execution.workflow.steps.StepException;
 import com.dtolabs.rundeck.core.plugins.Plugin;
 import com.dtolabs.rundeck.core.plugins.configuration.ConfigurationException;

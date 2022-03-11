@@ -2,11 +2,11 @@
 
 We provide a pre-built image including everything needed to take Rundeck and Ansible for a spin:
 
-- Rundeck 3.0.17
+- Rundeck 3.4.9
 - Ansible 2.7.9
 - and this plugin in the respective version
 
-The image can be found on the [Docker Hub](https://hub.docker.com/r/batix/rundeck-ansible/) and is based on the [official Rundeck docker image](https://hub.docker.com/r/rundeck/rundeck).
+The image can be found on the [Docker Hub](https://hub.docker.com/r/rundeck-plugins/ansible-plugin/) and is based on the [official Rundeck docker image](https://hub.docker.com/r/rundeck/rundeck).
 
 ### Preparations ###
 
@@ -31,13 +31,13 @@ Using `sudo`, `su`, etc. is also possible, see [Become (Privilege Escalation)](h
 Ensure you have the latest version of the image locally available:
 
 ```bash
-docker pull batix/rundeck-ansible
+docker pull rundeckpro/ansible-plugin
 ```
 
 Then make sure to be in the directory you created above and start the container like this:
 
 ```bash
-docker run -d --name rundeck-test -p 127.0.0.1:4440:4440 -v `pwd`:/home/rundeck/data batix/rundeck-ansible
+docker run -d --name rundeck-test -p 127.0.0.1:4440:4440 -v `pwd`:/home/rundeck/data rundeckpro/ansible-plugin
 ```
 
 If you are running Docker on Windows, replace `` `pwd` `` with `%CD%` for cmd or `${PWD}` for PowerShell (you might get a message, telling you that you need to share your drive first in the Docker for Windows settings, so do that beforehand; if the mounting fails - e.g. Rundeck / Ansible can't find the inventory - try un-sharing and re-sharing the drive).
@@ -64,7 +64,7 @@ docker rm -vf rundeck-test
 If you want to share your test installation externally, you need to change the `-p` option when starting the container, so it doesn't bind to 127.0.0.1, additionally you need to specifiy the external URL of your install, i.e. what others need to type in the browser to reach your Rundeck install. The environment variable `RUNDECK_GRAILS_URL` can be used to customize the address of the installation:
 
 ```bash
-docker run -d --name rundeck-test -p 4440:4440 -e RUNDECK_GRAILS_URL=http://my-host:4440 -v `pwd`:/home/rundeck/data batix/rundeck-ansible
+docker run -d --name rundeck-test -p 4440:4440 -e RUNDECK_GRAILS_URL=http://my-host:4440 -v `pwd`:/home/rundeck/data rundeckpro/ansible-plugin
 ```
 
 **Warning:** Don't leave your test install running exposed to the public! Read up on the proper install procedure and configuration in the [Rundeck docs](https://docs.rundeck.com/docs/administration/security/index.html). At least change your password.

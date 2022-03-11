@@ -1,24 +1,35 @@
-group 'com.batix.rundeck'
-version = System.env.TRAVIS_TAG ?: "SNAPSHOT"
+plugins {
+  id 'pl.allegro.tech.build.axion-release' version '1.12.0'
+}
+
+group 'com.rundeck'
 
 ext.rundeckPluginVersion = '1.2'
 ext.pluginClassNames = [
-  'com.batix.rundeck.plugins.AnsibleResourceModelSourceFactory',
-  'com.batix.rundeck.plugins.AnsibleNodeExecutor',
-  'com.batix.rundeck.plugins.AnsibleFileCopier',
-  'com.batix.rundeck.plugins.AnsiblePlaybookWorkflowStep',
-  'com.batix.rundeck.plugins.AnsiblePlaybookInlineWorkflowStep',
-  'com.batix.rundeck.plugins.AnsibleModuleWorkflowStep',
-  'com.batix.rundeck.plugins.AnsiblePlaybookWorflowNodeStep',
-  'com.batix.rundeck.plugins.AnsiblePlaybookInlineWorkflowNodeStep'
+  'com.rundeck.plugins.ansible.plugin.AnsibleResourceModelSourceFactory',
+  'com.rundeck.plugins.ansible.plugin.AnsibleNodeExecutor',
+  'com.rundeck.plugins.ansible.plugin.AnsibleFileCopier',
+  'com.rundeck.plugins.ansible.plugin.AnsiblePlaybookWorkflowStep',
+  'com.rundeck.plugins.ansible.plugin.AnsiblePlaybookInlineWorkflowStep',
+  'com.rundeck.plugins.ansible.plugin.AnsibleModuleWorkflowStep',
+  'com.rundeck.plugins.ansible.plugin.AnsiblePlaybookWorflowNodeStep',
+  'com.rundeck.plugins.ansible.plugin.AnsiblePlaybookInlineWorkflowNodeStep'
 ].join(',')
 
+apply plugin: 'groovy'
 apply plugin: 'java'
+apply plugin: 'maven'
+sourceCompatibility = 1.8
 
-sourceCompatibility = '1.7'
+scmVersion {
+  ignoreUncommittedChanges = true
+}
+
+version = scmVersion.version
 
 repositories {
   mavenCentral()
+  mavenLocal()
 }
 
 configurations {
@@ -48,7 +59,7 @@ jar {
     attributes 'Rundeck-Plugin-Rundeck-Compatibility-Version': '3.0.1+'
     attributes 'Rundeck-Plugin-Tags': 'java,node executor,resource model,workflow step,ansible'
     attributes 'Rundeck-Plugin-License': 'MIT'
-    attributes 'Rundeck-Plugin-Source-Link': 'https://github.com/Batix/rundeck-ansible-plugin'
+    attributes 'Rundeck-Plugin-Source-Link': 'https://github.com/rundeck-plugins/rundeck-ansible-plugin'
     attributes 'Rundeck-Plugin-Target-Host-Compatibility': 'all'
     attributes 'Rundeck-Plugin-Author': 'David Kirstein'
     attributes 'Rundeck-Plugin-Classnames': pluginClassNames
@@ -56,7 +67,7 @@ jar {
     attributes 'Rundeck-Plugin-Version': rundeckPluginVersion
     attributes 'Rundeck-Plugin-Archive': 'true'
     attributes 'Rundeck-Plugin-Libs': "${libList}"
-    attributes 'Rundeck-Plugin-URL': 'https://github.com/Batix/rundeck-ansible-plugin'
+    attributes 'Rundeck-Plugin-URL': 'https://github.com/rundeck-plugins/rundeck-ansible-plugin'
   }
   dependsOn(copyToLib)
 }

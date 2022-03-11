@@ -3,7 +3,7 @@
  *
  * @author Yassine Azzouz <a href="mailto:yassine.azzouz@gmail.com">yassine.azzouz@gmail.com</a>
  */
-package com.batix.rundeck.utils;
+package com.rundeck.plugins.ansible.util;
 
 import java.io.*;
 

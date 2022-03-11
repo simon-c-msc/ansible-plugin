@@ -3,12 +3,12 @@
  *
  * @author Yassine Azzouz <a href="mailto:yassine.azzouz@gmail.com">yassine.azzouz@gmail.com</a>
  */
-package com.batix.rundeck.core;
+package com.rundeck.plugins.ansible.ansible;
 
 import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.common.INodeSet;
-import com.batix.rundeck.core.AnsibleDescribable.AuthenticationType;
-import com.batix.rundeck.core.AnsibleDescribable.BecomeMethodType;
+import com.rundeck.plugins.ansible.ansible.AnsibleDescribable.AuthenticationType;
+import com.rundeck.plugins.ansible.ansible.AnsibleDescribable.BecomeMethodType;
 import com.dtolabs.rundeck.core.common.Framework;
 import com.dtolabs.rundeck.core.dispatcher.DataContextUtils;
 import com.dtolabs.rundeck.core.execution.ExecutionContext;

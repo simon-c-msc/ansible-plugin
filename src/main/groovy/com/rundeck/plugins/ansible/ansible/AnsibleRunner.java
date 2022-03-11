@@ -1,9 +1,9 @@
-package com.batix.rundeck.core;
+package com.rundeck.plugins.ansible.ansible;
 
-import com.batix.rundeck.utils.Logging;
-import com.batix.rundeck.utils.ListenerFactory;
-import com.batix.rundeck.utils.Listener;
-import com.batix.rundeck.utils.ArgumentTokenizer;
+import com.rundeck.plugins.ansible.util.Logging;
+import com.rundeck.plugins.ansible.util.ListenerFactory;
+import com.rundeck.plugins.ansible.util.Listener;
+import com.rundeck.plugins.ansible.util.ArgumentTokenizer;
 import com.dtolabs.rundeck.core.utils.SSHAgentProcess;
 
 import java.io.*;

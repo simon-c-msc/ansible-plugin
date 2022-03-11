@@ -1,4 +1,4 @@
-package com.batix.rundeck.utils;
+package com.rundeck.plugins.ansible.util;
 
 import java.io.*;
 

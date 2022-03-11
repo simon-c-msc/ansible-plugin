@@ -1,9 +1,9 @@
-package com.batix.rundeck.plugins;
+package com.rundeck.plugins.ansible.plugin;
 
-import com.batix.rundeck.core.AnsibleDescribable;
-import com.batix.rundeck.core.AnsibleException;
-import com.batix.rundeck.core.AnsibleRunner;
-import com.batix.rundeck.core.AnsibleRunnerBuilder;
+import com.rundeck.plugins.ansible.ansible.AnsibleDescribable;
+import com.rundeck.plugins.ansible.ansible.AnsibleException;
+import com.rundeck.plugins.ansible.ansible.AnsibleRunner;
+import com.rundeck.plugins.ansible.ansible.AnsibleRunnerBuilder;
 import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.execution.workflow.steps.node.NodeStepException;
 import com.dtolabs.rundeck.core.plugins.Plugin;
@@ -16,21 +16,21 @@ import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 
 import java.util.Map;
 
-@Plugin(name = AnsiblePlaybookInlineWorkflowNodeStep.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.WorkflowNodeStep)
-public class AnsiblePlaybookInlineWorkflowNodeStep implements NodeStepPlugin, AnsibleDescribable {
+@Plugin(name = AnsiblePlaybookWorflowNodeStep.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.WorkflowNodeStep)
+public class AnsiblePlaybookWorflowNodeStep implements NodeStepPlugin, AnsibleDescribable {
 
-    public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsiblePlaybookInlineWorkflowNodeStep";
+    public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsiblePlaybookWorflowNodeStep";
 
     public static Description DESC = null;
 
     static {
         DescriptionBuilder builder = DescriptionBuilder.builder();
         builder.name(SERVICE_PROVIDER_NAME);
-        builder.title("Ansible Playbook Inline Workflow Node Step");
-        builder.description("Runs an Inline Ansible Playbook.");
+        builder.title("Ansible Playbook Workflow Node Step.");
+        builder.description("Runs an Ansible Playbook");
 
         builder.property(BASE_DIR_PROP);
-        builder.property(PLAYBOOK_INLINE_PROP);
+        builder.property(PLAYBOOK_PATH_PROP);
         builder.property(EXTRA_VARS_PROP);
         builder.property(VAULT_KEY_FILE_PROP);
         builder.property(VAULT_KEY_STORAGE_PROP);
@@ -64,9 +64,8 @@ public class AnsiblePlaybookInlineWorkflowNodeStep implements NodeStepPlugin, An
 
         AnsibleRunner runner = null;
 
-        // set targets
-        configuration.put(AnsibleDescribable.ANSIBLE_LIMIT,entry.getNodename());
 
+        configuration.put(AnsibleDescribable.ANSIBLE_LIMIT,entry.getNodename());
         // set log level
         if (context.getDataContext().get("job").get("loglevel").equals("DEBUG")) {
             configuration.put(AnsibleDescribable.ANSIBLE_DEBUG,"True");
@@ -74,7 +73,7 @@ public class AnsiblePlaybookInlineWorkflowNodeStep implements NodeStepPlugin, An
             configuration.put(AnsibleDescribable.ANSIBLE_DEBUG,"False");
         }
 
-       AnsibleRunnerBuilder
+        AnsibleRunnerBuilder
                 builder = new AnsibleRunnerBuilder(context.getExecutionContext(), context.getFramework(), context.getNodes(), configuration);
 
         try {
@@ -93,6 +92,5 @@ public class AnsiblePlaybookInlineWorkflowNodeStep implements NodeStepPlugin, An
         }
 
         builder.cleanupTempFiles();
-
     }
 }

@@ -72,6 +72,6 @@ Periodically update the `Dockerfile` with newer Ansible and Rundeck versions - s
 
 *This is deprecated.*
 
-Build the image in the root directory with `docker build --pull -t batix/rundeck-ansible .`, this creates a local image and tags it. `--pull` will always look for the newest alpine image. Add `--no-cache` to force a complete rebuild.
+Build the image in the root directory with `docker build --pull -t rundeckpro/ansible-plugin .`, this creates a local image and tags it. `--pull` will always look for the newest alpine image. Add `--no-cache` to force a complete rebuild.
 
-Push the image via `docker push batix/rundeck-ansible`, this will upload it to the Docker Hub, if you have permission.
+Push the image via `docker push rundeckpro/ansible-plugin`, this will upload it to the Docker Hub, if you have permission.

@@ -1,9 +1,9 @@
-package com.batix.rundeck.plugins;
+package com.rundeck.plugins.ansible.plugin;
 
-import com.batix.rundeck.core.AnsibleDescribable;
-import com.batix.rundeck.core.AnsibleDescribable.AuthenticationType;
-import com.batix.rundeck.core.AnsibleException;
-import com.batix.rundeck.core.AnsibleRunner;
+import com.rundeck.plugins.ansible.ansible.AnsibleDescribable;
+import com.rundeck.plugins.ansible.ansible.AnsibleDescribable.AuthenticationType;
+import com.rundeck.plugins.ansible.ansible.AnsibleException;
+import com.rundeck.plugins.ansible.ansible.AnsibleRunner;
 import com.dtolabs.rundeck.core.common.Framework;
 import com.dtolabs.rundeck.core.common.INodeSet;
 import com.dtolabs.rundeck.core.common.NodeEntryImpl;

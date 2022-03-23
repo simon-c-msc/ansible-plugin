@@ -25,7 +25,7 @@ jobs:
       - name: Get Release Version
         id: get_version
         run: VERSION=$(./gradlew currentVersion -q -Prelease.quiet) && echo ::set-output name=VERSION::$VERSION
-      - name: Upload azure plugin jar
+      - name: Upload plugin jar
         uses: actions/upload-artifact@v1.0.0
         with:
           # Artifact name

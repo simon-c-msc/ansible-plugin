@@ -41,37 +41,10 @@ Binaries will be automatically built when a GitHub release is published. On a su
 - The .jar file will be added to the GitHub release
 - A new Docker image will be built and pushed to the Docker Hub
 
-All you have to do is create a new release, give it a name and tag (for example 1.3.0, no leading "v") and describe the changes. [Travis](https://travis-ci.org/Batix/rundeck-ansible-plugin) takes care of the rest.
-
-Note: Do not include `[ci skip]` in the commit message used for a tag, as Travis won't start build.
-
-### Old Manual Release ###
-
-*This is deprecated.*
-
-- Change version in [build.gradle line 2](build.gradle)
-    - Refer to [Semantic Versioning](http://semver.org/) to determine which level to increment
-- Build a new jar with gradle (run `gradlew jar`), it will be in `build/libs`
-- Check if everything works
-    - *Tests are a TODO, I'm working on some automated Docker testing atm*
-- Commit and push with message like "1.3.0"
-- Draft a new release on GitHub
-    - Tag version: 1.3.0
-    - Release title: 1.3.0
-    - Describe the notable changes
-    - Upload the .jar (drag and drop for example)
-- Publish the release
+All you have to do is create a new release, give it a name and tag (for example 1.3.0, no leading "v") and describe the changes. GitHub Actions takes care of the rest.
 
 ## Docker ##
 
 A Docker image will be automatically built and published for tags on the master branch. 
 
 Periodically update the `Dockerfile` with newer Ansible and Rundeck versions - see the comments there for where to find the newest versions.
-
-### Old Manual Release ###
-
-*This is deprecated.*
-
-Build the image in the root directory with `docker build --pull -t batix/rundeck-ansible .`, this creates a local image and tags it. `--pull` will always look for the newest alpine image. Add `--no-cache` to force a complete rebuild.
-
-Push the image via `docker push batix/rundeck-ansible`, this will upload it to the Docker Hub, if you have permission.

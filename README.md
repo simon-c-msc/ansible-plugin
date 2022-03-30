@@ -1,6 +1,6 @@
-[![Gitter](https://img.shields.io/gitter/room/rundeck-ansible-plugin/Lobby.svg)](https://gitter.im/rundeck-ansible-plugin/Lobby) [![Build Status](https://travis-ci.com/Batix/rundeck-ansible-plugin.svg?branch=master)](https://travis-ci.com/Batix/rundeck-ansible-plugin) [Read more about Rundeck + Ansible](https://www.rundeck.com/ansible)
+[![Gitter](https://img.shields.io/gitter/room/rundeck-ansible-plugin/Lobby.svg)](https://gitter.im/rundeck-ansible-plugin/Lobby) [![Build Status](https://travis-ci.com/rundeck-plugins/ansible-plugin.svg?branch=master)](https://travis-ci.com/rundeck-plugins/ansible-plugin) [Read more about Rundeck + Ansible](https://www.rundeck.com/ansible)
 
-Please [report](https://github.com/Batix/rundeck-ansible-plugin/issues) any errors or suggestions!
+Please [report](https://github.com/rundeck-plugins/ansible-plugin/issues) any errors or suggestions!
 
 ## **MIGRATION NOTICE!!** ##
 
@@ -24,7 +24,9 @@ Uses the default configured inventory to scan for nodes. Facts are discovered by
 
 Host groups are imported as tags, you can limit the import to just some selected [patterns](http://docs.ansible.com/ansible/intro_patterns.html), if you want.
 
-A bunch of facts are imported as attributes ([sample screenshot](http://batix.de/static/files/rundeck-ansible/node.png)).
+A bunch of facts are imported as attributes, e.g.:
+
+![Example of node attributes being automatically set by Ansible facts](./node.png)
 
 ### Node Executor ###
 
@@ -101,13 +103,13 @@ Become password configuration is very similar to ssh password, you can use eithe
 - Ansible executables in `$PATH` of Rundeck user
 - Rundeck user needs to be able to successfully run Ansible commands, that includes access to Ansible's config files and keys - it depends on your setup (whether you installed via .deb or launcher etc.)
   - You can check if everything works with something like this: `su rundeck -s /bin/bash -c "ansible all -m ping"`
-  - If it complains, chances are that your rundeck `$HOME` directory isn't writable by Rundeck, fix it with e.g. `chown rundeck /var/lib/rundeck` (see [this issue](https://github.com/Batix/rundeck-ansible-plugin/issues/2#issuecomment-197000132))
-  - Another thing, if you have a special setup: Rundeck's environment might be missing some things, if you are using `su` or similar to start rundeck - maybe you need to tell it to use a login shell via `-l` (see [this issue](https://github.com/Batix/rundeck-ansible-plugin/issues/3#issuecomment-198496564))
-  - If you are running CentOS 6.7 or similar (RHEL) or another system using SELinux, you may need to install libselinux-python (`yum install libselinux-python`) or disable SELinux on boot (see [this issue](https://github.com/Batix/rundeck-ansible-plugin/issues/13))
+  - If it complains, chances are that your rundeck `$HOME` directory isn't writable by Rundeck, fix it with e.g. `chown rundeck /var/lib/rundeck` (see [this issue](https://github.com/rundeck-plugins/ansible-plugin/issues/2#issuecomment-197000132))
+  - Another thing, if you have a special setup: Rundeck's environment might be missing some things, if you are using `su` or similar to start rundeck - maybe you need to tell it to use a login shell via `-l` (see [this issue](https://github.com/rundeck-plugins/ansible-plugin/issues/3#issuecomment-198496564))
+  - If you are running CentOS 6.7 or similar (RHEL) or another system using SELinux, you may need to install libselinux-python (`yum install libselinux-python`) or disable SELinux on boot (see [this issue](https://github.com/rundeck-plugins/ansible-plugin/issues/13))
 
 ## Installation ##
 
-- [Download the .jar file from GitHub](https://github.com/Batix/rundeck-ansible-plugin/releases) or compile it yourself (using Gradle, either your own the included wrapper)
+- [Download the .jar file from GitHub](https://github.com/rundeck-plugins/ansible-plugin/releases) or compile it yourself (using Gradle, either your own the included wrapper)
 - Copy the .jar file to your Rundeck plugins directory (`/var/lib/rundeck/libext` if you installed the .deb, for example)
 - Create a new project (this assumes you want every node in your project to be controlled via Ansible)
 - Choose "Ansible Resource Model Source" as the resource model source

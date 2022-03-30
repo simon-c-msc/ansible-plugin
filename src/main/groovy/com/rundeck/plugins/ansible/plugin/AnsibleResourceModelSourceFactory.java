@@ -1,6 +1,6 @@
-package com.batix.rundeck.plugins;
+package com.rundeck.plugins.ansible.plugin;
 
-import com.batix.rundeck.core.AnsibleDescribable;
+import com.rundeck.plugins.ansible.ansible.AnsibleDescribable;
 import com.dtolabs.rundeck.core.common.Framework;
 import com.dtolabs.rundeck.core.plugins.Plugin;
 import com.dtolabs.rundeck.core.plugins.configuration.ConfigurationException;

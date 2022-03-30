@@ -1,12 +1,11 @@
-package com.batix.rundeck.plugins;
+package com.rundeck.plugins.ansible.plugin;
 
-import com.dtolabs.rundeck.core.execution.ExecutionLogger;
 import com.dtolabs.rundeck.core.plugins.configuration.ConfigurationException;
-import com.batix.rundeck.core.AnsibleDescribable;
-import com.batix.rundeck.core.AnsibleException;
-import com.batix.rundeck.core.AnsibleRunner;
-import com.batix.rundeck.core.AnsibleRunnerBuilder;
-import com.batix.rundeck.core.PropertyResolver;
+import com.rundeck.plugins.ansible.ansible.AnsibleDescribable;
+import com.rundeck.plugins.ansible.ansible.AnsibleException;
+import com.rundeck.plugins.ansible.ansible.AnsibleRunner;
+import com.rundeck.plugins.ansible.ansible.AnsibleRunnerBuilder;
+import com.rundeck.plugins.ansible.ansible.PropertyResolver;
 import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.execution.ExecutionContext;
 import com.dtolabs.rundeck.core.execution.service.NodeExecutor;

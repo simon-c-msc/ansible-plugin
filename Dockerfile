@@ -1,8 +1,8 @@
 # Ubuntu 16.04 based, runs as rundeck user
 # https://hub.docker.com/r/rundeck/rundeck/tags
-FROM rundeck/rundeck:3.0.17
+FROM rundeck/rundeck:3.4.9
 
-MAINTAINER David Kirstein <dak@batix.com>
+MAINTAINER Rundeck Team
 
 ENV ANSIBLE_HOST_KEY_CHECKING=false
 ENV RDECK_BASE=/home/rundeck

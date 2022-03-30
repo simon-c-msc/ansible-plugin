@@ -34,7 +34,7 @@
  *
  * END_COPYRIGHT_BLOCK*/
 
-package com.batix.rundeck.utils;
+package com.rundeck.plugins.ansible.util;
 
 import java.util.List;
 import java.util.LinkedList;

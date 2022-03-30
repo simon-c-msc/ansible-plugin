@@ -1,4 +1,4 @@
-package com.batix.rundeck.core;
+package com.rundeck.plugins.ansible.ansible;
 
 import com.dtolabs.rundeck.core.plugins.configuration.Describable;
 import com.dtolabs.rundeck.core.plugins.configuration.Property;

@@ -19,7 +19,7 @@ import java.util.Map;
 @Plugin(name = AnsiblePlaybookInlineWorkflowNodeStep.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.WorkflowNodeStep)
 public class AnsiblePlaybookInlineWorkflowNodeStep implements NodeStepPlugin, AnsibleDescribable {
 
-    public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsiblePlaybookInlineWorkflowNodeStep";
+    public static final String SERVICE_PROVIDER_NAME = "com.rundeck.plugins.ansible.plugin.AnsiblePlaybookInlineWorkflowNodeStep";
 
     public static Description DESC = null;
 

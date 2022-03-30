@@ -24,7 +24,7 @@ import java.util.Map;
 @Plugin(name = AnsibleFileCopier.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.FileCopier)
 public class AnsibleFileCopier implements FileCopier, AnsibleDescribable {
 
-  public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsibleFileCopier";
+  public static final String SERVICE_PROVIDER_NAME = "com.rundeck.plugins.ansible.plugin.AnsibleFileCopier";
 
   public static Description DESC = null;
 

@@ -22,7 +22,7 @@ import java.util.Map;
 @Plugin(name = AnsibleNodeExecutor.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.NodeExecutor)
 public class AnsibleNodeExecutor implements NodeExecutor, AnsibleDescribable {
 
-  public static final String SERVICE_PROVIDER_NAME = "com.rundeck.plugins.ansible.plugin.AnsibleNodeExecutor";
+  public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsibleNodeExecutor";
 
   public static Description DESC = null;
 

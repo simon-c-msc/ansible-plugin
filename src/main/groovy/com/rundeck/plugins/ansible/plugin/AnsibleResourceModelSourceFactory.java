@@ -14,7 +14,7 @@ import java.util.Properties;
 
 @Plugin(name = AnsibleResourceModelSourceFactory.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.ResourceModelSource)
 public class AnsibleResourceModelSourceFactory implements ResourceModelSourceFactory, AnsibleDescribable {
-    public static final String SERVICE_PROVIDER_NAME = "com.rundeck.plugins.ansible.plugin.AnsibleResourceModelSourceFactory";
+    public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsibleResourceModelSourceFactory";
 
     public static Description DESC = null;
 

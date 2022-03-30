@@ -19,7 +19,7 @@ import java.util.Map;
 @Plugin(name = AnsiblePlaybookWorflowNodeStep.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.WorkflowNodeStep)
 public class AnsiblePlaybookWorflowNodeStep implements NodeStepPlugin, AnsibleDescribable {
 
-    public static final String SERVICE_PROVIDER_NAME = "com.rundeck.plugins.ansible.plugin.AnsiblePlaybookWorflowNodeStep";
+    public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsiblePlaybookWorflowNodeStep";
 
     public static Description DESC = null;
 

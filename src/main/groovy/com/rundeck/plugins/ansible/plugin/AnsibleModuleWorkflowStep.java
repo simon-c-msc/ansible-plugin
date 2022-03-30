@@ -18,7 +18,7 @@ import java.util.Map;
 @Plugin(name = AnsibleModuleWorkflowStep.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.WorkflowStep)
 public class AnsibleModuleWorkflowStep implements StepPlugin, AnsibleDescribable {
 
-    public static final String SERVICE_PROVIDER_NAME = "com.rundeck.plugins.ansible.plugin.AnsibleModuleWorkflowStep";
+    public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsibleModuleWorkflowStep";
 
     public static Description DESC = null;
 

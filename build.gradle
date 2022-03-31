@@ -1,5 +1,5 @@
 plugins {
-  id 'pl.allegro.tech.build.axion-release' version '1.12.0'
+  id 'pl.allegro.tech.build.axion-release' version '1.13.6'
 }
 
 group 'com.rundeck'
@@ -22,11 +22,11 @@ apply plugin: 'maven'
 sourceCompatibility = 1.8
 
 scmVersion {
-  ignoreUncommittedChanges = true
-  tag {
-    prefix = 'v'
-    versionSeparator = ''
-  }
+    ignoreUncommittedChanges = true
+    tag {
+        prefix = 'v'
+        versionSeparator = ''
+    }
 }
 
 version = scmVersion.version

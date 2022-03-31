@@ -35,13 +35,9 @@ TBD
 
 ## Releases ##
 
-Version / tags / release names don't have a leading 'v', consist of major.minor.patch and use [Semantic Versioning](http://semver.org/).
+Version / tags / release names have a leading 'v', consist of major.minor.patch and use [Semantic Versioning](http://semver.org/).
 
-Binaries will be automatically built when a GitHub release is published. On a successful CI build:
-- The .jar file will be added to the GitHub release
-- A new Docker image will be built and pushed to the Docker Hub
-
-All you have to do is create a new release, give it a name and tag (for example 1.3.0, no leading "v") and describe the changes. GitHub Actions takes care of the rest.
+GitHub releases will automatically be published via GitHub Actions. Once a `vX.X.X` tag is created or pushed, a jar will be built, and added to the release.
 
 ## Docker ##
 

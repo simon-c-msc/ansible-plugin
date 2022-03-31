@@ -22,6 +22,7 @@ apply plugin: 'maven'
 sourceCompatibility = 1.8
 
 scmVersion {
+    ignoreUncommittedChanges = true
     tag {
         prefix = 'v'
         versionSeparator = ''

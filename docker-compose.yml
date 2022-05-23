@@ -18,7 +18,7 @@ services:
       args:
         RUNDECK_IMAGE: ${RUNDECK_IMAGE:-rundeck/rundeck:SNAPSHOT}
     image: rundeck-ansible-plugin:latest
-    command: "-Dansible.debug=true"
+    command: "-Dansible.debug=false"
     environment:
       RUNDECK_GRAILS_URL: http://localhost:4440
     networks:

@@ -1,7 +1,7 @@
 # Ubuntu 16.04 based, runs as rundeck user
 # https://hub.docker.com/r/rundeck/rundeck/tags
-FROM rundeck/rundeck:3.4.9
-
+ARG RUNDECK_IMAGE
+FROM ${RUNDECK_IMAGE}
 MAINTAINER Rundeck Team
 
 ENV ANSIBLE_HOST_KEY_CHECKING=false
@@ -21,7 +21,7 @@ RUN sudo apt-get -y update \
     python3-venv sshpass zip unzip \
   # https://pypi.org/project/ansible/#history
   && sudo -H pip3 install --upgrade pip==20.3.4 \
-  && sudo -H pip3 --no-cache-dir install ansible==2.9.14 \
+  && sudo -H pip3 --no-cache-dir install ansible==2.9.22 \
   && sudo rm -rf /var/lib/apt/lists/* \
   && mkdir -p ${PROJECT_BASE}/etc/ \
   && sudo mkdir /etc/ansible
@@ -35,14 +35,12 @@ RUN mkdir -p $HOME/.venv \
 
 # add default project
 COPY --chown=rundeck:rundeck docker/project.properties ${PROJECT_BASE}/etc/
-
-# add SSH key
-COPY --chown=rundeck:rundeck docker/ssh-key ${RDECK_BASE}/.ssh/ssh-node.key
+COPY --chown=rundeck:rundeck docker/project.properties ${PROJECT_BASE}/etc/
 
 # remove embedded rundeck-ansible-plugin
-RUN zip -d rundeck.war WEB-INF/rundeck/plugins/rundeck-ansible-plugin-* \
+RUN zip -d rundeck.war WEB-INF/rundeck/plugins/ansible-plugin-* \
   && unzip -C rundeck.war WEB-INF/rundeck/plugins/manifest.properties \
-  && sed -i "s/\(.*\)\(rundeck-ansible-plugin-.*\.jar,\)\(.*\)/\1\3/" WEB-INF/rundeck/plugins/manifest.properties \
+  && sed -i "s/\(.*\)\(ansible-plugin-.*\.jar,\)\(.*\)/\1\3/" WEB-INF/rundeck/plugins/manifest.properties \
   && zip -u rundeck.war WEB-INF/rundeck/plugins/manifest.properties \
   && rm WEB-INF/rundeck/plugins/manifest.properties
 

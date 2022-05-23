@@ -30,6 +30,7 @@ public class AnsibleResourceModelSourceFactory implements ResourceModelSourceFac
         builder.title("Ansible Resource Model Source");
         builder.description("Imports nodes from Ansible's inventory.");
 
+        builder.property(BINARIES_DIR_PATH_PROP);
         builder.property(INVENTORY_PROP);
         builder.property(CONFIG_FILE_PATH);
         builder.property(GATHER_FACTS_PROP);

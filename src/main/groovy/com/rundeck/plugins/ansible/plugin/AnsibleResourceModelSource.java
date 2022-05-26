@@ -26,6 +26,7 @@ import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class AnsibleResourceModelSource implements ResourceModelSource {
 
@@ -112,9 +113,6 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
     limit = (String) resolveProperty(AnsibleDescribable.ANSIBLE_LIMIT,null,configuration,executionDataContext);
     ignoreTagPrefix = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_TAGS,null,configuration,executionDataContext);
-    
-    importInventoryVars = "true".equals(resolveProperty(AnsibleDescribable.ANSIBLE_IMPORT_INVENTORY_VARS,null,configuration,executionDataContext));
-    ignoreInventoryVars = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_INVENTORY_VARS,null,configuration,executionDataContext);
 
     extraTag = (String) resolveProperty(AnsibleDescribable.ANSIBLE_EXTRA_TAG,null,configuration,executionDataContext);
 
@@ -155,72 +153,72 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
   public AnsibleRunner buildAnsibleRunner() throws ResourceModelSourceException{
 
-    AnsibleRunner runner = AnsibleRunner.playbookPath("gather-hosts.yml");
+	  AnsibleRunner runner = AnsibleRunner.playbookPath("gather-hosts.yml");
 
-    if ("true".equals(System.getProperty("ansible.debug"))) {
-      runner.debug();
-    }
+	  if ("true".equals(System.getProperty("ansible.debug"))) {
+		  runner.debug();
+	  }
 
-    if (limit != null && limit.length() > 0) {
-      List<String> limitList = new ArrayList<>();
-      limitList.add(limit);
-      runner.limit(limitList);
-    }
+	  if (limit != null && limit.length() > 0) {
+		  List<String> limitList = new ArrayList<>();
+		  limitList.add(limit);
+		  runner.limit(limitList);
+	  }
 
-    if ( sshAuthType.equalsIgnoreCase(AuthenticationType.privateKey.name()) ) {
-      if (sshPrivateKeyFile != null) {
-        String sshPrivateKey;
-        try {
-          sshPrivateKey = new String(Files.readAllBytes(Paths.get(sshPrivateKeyFile)));
-        } catch (IOException e) {
-          throw new ResourceModelSourceException("Could not read privatekey file " + sshPrivateKeyFile,e);
-        }
-        runner = runner.sshPrivateKey(sshPrivateKey);
-      }
-    } else if ( sshAuthType.equalsIgnoreCase(AuthenticationType.password.name()) ) {
-      if (sshPassword != null) {
-        runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
-      }
-    }
+		  if ( sshAuthType.equalsIgnoreCase(AuthenticationType.privateKey.name()) ) {
+			  if (sshPrivateKeyFile != null) {
+				  String sshPrivateKey;
+				  try {
+					  sshPrivateKey = new String(Files.readAllBytes(Paths.get(sshPrivateKeyFile)));
+				  } catch (IOException e) {
+					  throw new ResourceModelSourceException("Could not read privatekey file " + sshPrivateKeyFile,e);
+				  }
+				  runner = runner.sshPrivateKey(sshPrivateKey);
+			  }
+		  } else if ( sshAuthType.equalsIgnoreCase(AuthenticationType.password.name()) ) {
+			  if (sshPassword != null) {
+				  runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
+			  }
+		  }
 
 
-    if (inventory != null) {
-      runner = runner.setInventory(inventory);
-    }
+	  if (inventory != null) {
+		  runner = runner.setInventory(inventory);
+	  }
 
-    if (ignoreErrors == true) {
-      runner = runner.ignoreErrors(ignoreErrors);
-    }
+	  if (ignoreErrors == true) {
+		  runner = runner.ignoreErrors(ignoreErrors);
+	  }
 
-    if (sshUser != null) {
-      runner = runner.sshUser(sshUser);
-    }
-    if (sshTimeout != null) {
-      runner = runner.sshTimeout(sshTimeout);
-    }
+	  if (sshUser != null) {
+		  runner = runner.sshUser(sshUser);
+	  }
+	  if (sshTimeout != null) {
+		  runner = runner.sshTimeout(sshTimeout);
+	  }
 
-    if (become != null) {
-      runner = runner.become(become);
-    }
+	  if (become != null) {
+		  runner = runner.become(become);
+	  }
 
-    if (becomeUser != null) {
-      runner = runner.becomeUser(becomeUser);
-    }
+	  if (becomeUser != null) {
+		  runner = runner.becomeUser(becomeUser);
+	  }
 
-    if (becomeMethod != null) {
-      runner = runner.becomeMethod(becomeMethod);
-    }
+	  if (becomeMethod != null) {
+		  runner = runner.becomeMethod(becomeMethod);
+	  }
 
-    if (becomePassword != null) {
-      runner = runner.becomePassword(becomePassword);
-    }
+	  if (becomePassword != null) {
+		  runner = runner.becomePassword(becomePassword);
+	  }
 
       if (configFile != null) {
         runner = runner.configFile(configFile);
       }
 
       if(vaultPassword!=null) {
-      runner.vaultPass(vaultPassword);
+	    runner.vaultPass(vaultPassword);
       }
 
       if (vaultFile != null) {
@@ -233,14 +231,14 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
         runner.vaultPass(vaultPassword);
       }
       if (baseDirectoryPath != null) {
-        runner.baseDirectory(baseDirectoryPath);
+	      runner.baseDirectory(baseDirectoryPath);
       }
 
       if (extraParameters != null){
         runner.extraParams(extraParameters);
       }
 
-    return runner;
+	  return runner;
   }
 
 
@@ -306,9 +304,10 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           }catch(Exception ex){
             System.out.println("[warn] Problem getting the ansible_host attribute from node " + hostname);
           }
-          node.setHostname(hostname);
 
           String nodename = root.get("inventory_hostname").getAsString();
+
+          node.setHostname(hostname);
           node.setNodename(nodename);
 
           String username = sshUser; // Use sshUser as default username

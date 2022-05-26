@@ -1,16 +1,12 @@
 package com.rundeck.plugins.ansible.ansible;
 
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.stream.JsonReader;
 
 public class AnsibleInventory {
 

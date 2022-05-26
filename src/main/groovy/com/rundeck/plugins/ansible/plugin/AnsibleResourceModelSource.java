@@ -13,11 +13,10 @@ import com.dtolabs.rundeck.core.resources.ResourceModelSource;
 import com.dtolabs.rundeck.core.resources.ResourceModelSourceException;
 import com.dtolabs.rundeck.core.plugins.ScriptDataContextUtil;
 import com.dtolabs.rundeck.core.plugins.configuration.ConfigurationException;
-import com.google.gson.Gson;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,15 +25,14 @@ import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
-import java.util.Map.Entry;
 
 public class AnsibleResourceModelSource implements ResourceModelSource {
 
   private Framework framework;
-
+  
   private String project;
   private String sshAuthType;
-
+  
   private HashMap<String, Map<String, String>> configDataContext;
   private Map<String, Map<String, String>> executionDataContext;
 
@@ -44,8 +42,6 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
   private String limit;
   private String ignoreTagPrefix;
   private String extraTag;
-  private boolean importInventoryVars;
-  private String ignoreInventoryVars;
 
   protected String vaultPass;
   protected Boolean debug = false;
@@ -90,13 +86,6 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
         }
   }
 
-  private static Boolean skipVar(final String hostVar, final List<String> varList) {
-    for (final String specialVarString : varList) {
-      if (hostVar.startsWith(specialVarString)) return true;
-    }
-    return false;
-  }
-
   public void configure(Properties configuration) throws ConfigurationException {
 
     project = configuration.getProperty("project");
@@ -110,20 +99,20 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
     inventory = resolveProperty(AnsibleDescribable.ANSIBLE_INVENTORY,null,configuration,executionDataContext);
     gatherFacts = "true".equals(resolveProperty(AnsibleDescribable.ANSIBLE_GATHER_FACTS,null,configuration,executionDataContext));
     ignoreErrors = "true".equals(resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_ERRORS,null,configuration,executionDataContext));
-
+    
     limit = (String) resolveProperty(AnsibleDescribable.ANSIBLE_LIMIT,null,configuration,executionDataContext);
     ignoreTagPrefix = (String) resolveProperty(AnsibleDescribable.ANSIBLE_IGNORE_TAGS,null,configuration,executionDataContext);
 
     extraTag = (String) resolveProperty(AnsibleDescribable.ANSIBLE_EXTRA_TAG,null,configuration,executionDataContext);
-
+    
     sshAuthType = resolveProperty(AnsibleDescribable.ANSIBLE_SSH_AUTH_TYPE,AuthenticationType.privateKey.name(),configuration,executionDataContext);
-
+    
     sshUser = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_USER,null,configuration,executionDataContext);
 
     sshPrivateKeyFile = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_KEYPATH,null,configuration,executionDataContext);
 
     sshPassword = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_PASSWORD,null,configuration,executionDataContext);
-
+    
     sshTimeout = null;
     String str_sshTimeout = resolveProperty(AnsibleDescribable.ANSIBLE_SSH_TIMEOUT,null,configuration,executionDataContext);
     if ( str_sshTimeout != null ) {
@@ -133,7 +122,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           throw new ConfigurationException("Can't parse timeout value : " + e.getMessage());
        }
     }
-
+    
     become = "true".equals( resolveProperty(AnsibleDescribable.ANSIBLE_BECOME,null,configuration,executionDataContext) );
     becomeMethod = (String) resolveProperty(AnsibleDescribable.ANSIBLE_BECOME_METHOD,null,configuration,executionDataContext);
     becomeUser = (String) resolveProperty(AnsibleDescribable.ANSIBLE_BECOME_USER,null,configuration,executionDataContext);
@@ -164,7 +153,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 		  limitList.add(limit);
 		  runner.limit(limitList);
 	  }
-
+	  
 		  if ( sshAuthType.equalsIgnoreCase(AuthenticationType.privateKey.name()) ) {
 			  if (sshPrivateKeyFile != null) {
 				  String sshPrivateKey;
@@ -180,7 +169,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 				  runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
 			  }
 		  }
-
+	  
 
 	  if (inventory != null) {
 		  runner = runner.setInventory(inventory);
@@ -245,7 +234,6 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
   @Override
   public INodeSet getNodes() throws ResourceModelSourceException {
     NodeSetImpl nodes = new NodeSetImpl();
-    final Gson gson = new Gson();
 
     Path tempDirectory;
     try {
@@ -272,7 +260,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
         .append("tmpdir: '")
         .append(tempDirectory.toFile().getAbsolutePath())
         .append("'");
-
+    
     runner.extraVars(args.toString());
 
     try {
@@ -320,15 +308,13 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           }
           node.setUsername(username);
 
-          // Add groups as tags, except ignored tag prefix
           HashSet<String> tags = new HashSet<>();
           for (JsonElement ele : root.getAsJsonArray("group_names")) {
             if (ignoreTagPrefix != null && ignoreTagPrefix.length() > 0 && ele.getAsString().startsWith(ignoreTagPrefix)) continue;
             tags.add(ele.getAsString());
           }
-          // Add extraTag to node
           if (extraTag != null && extraTag.length() > 0) {
-            tags.add(extraTag);
+        	tags.add(extraTag);
           }
           node.setTags(tags);
 
@@ -368,7 +354,6 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
             node.setOsVersion(root.get("ansible_kernel").getAsString());
           }
 
-          // Add Ansible interesting vars as node attributes
           // JSON-Path -> Attribute-Name
           Map<String, String> interestingItems = new HashMap<>();
 
@@ -442,56 +427,6 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
                 && root.get(item.getKey()).isJsonPrimitive()
                 && root.get(item.getKey()).getAsString().length() > 0) {
                 node.setAttribute(item.getValue(), root.get(item.getKey()).getAsString());
-              }
-            }
-          }
-
-
-          if (importInventoryVars == true) {
-            // Add ALL vars as node attributes, except Ansible Special variables, as of Ansible 2.9
-            // https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
-            List<String> specialVarsList = new ArrayList<>();
-            specialVarsList.add("ansible_");  // most ansible vars prefix
-            specialVarsList.add("discovered_interpreter_python");
-            specialVarsList.add("facts");   // rundeck used to gather host_vars 
-            specialVarsList.add("gather_subset");
-            specialVarsList.add("group_names");
-            specialVarsList.add("groups");
-            specialVarsList.add("hostvars");
-            specialVarsList.add("inventory_dir");
-            specialVarsList.add("inventory_file");
-            specialVarsList.add("inventory_hostname");
-            specialVarsList.add("inventory_hostname_short");
-            specialVarsList.add("module_setup");
-            specialVarsList.add("omit");
-            specialVarsList.add("play_hosts");
-            specialVarsList.add("playbook_dir");
-            specialVarsList.add("role_name");
-            specialVarsList.add("role_names");
-            specialVarsList.add("role_path");
-            specialVarsList.add("tmpdir");  // rundeck used to gather host_vars 
-
-            if (ignoreInventoryVars != null && ignoreInventoryVars.length() > 0) {
-              String[] ignoreInventoryVarsStrings = ignoreInventoryVars.split(",");
-              for (String ignoreInventoryVarsString: ignoreInventoryVarsStrings) {
-                specialVarsList.add(ignoreInventoryVarsString.trim());
-              }
-            }
-            
-            // for (String hostVar : root.keySet()) {
-            for (Entry<String, JsonElement> hostVar : root.entrySet()) {
-
-              // skip Ansible special vars
-              if (skipVar(hostVar.getKey(), specialVarsList)) {
-                continue;
-              }
-
-              if (hostVar.getValue() instanceof JsonPrimitive && ((JsonPrimitive) hostVar.getValue()).isString()) {
-                // Keep attribute as String, don't serialize as Json
-                node.setAttribute(hostVar.getKey(), hostVar.getValue().getAsString());
-              } else {
-                // Serialize attribute as Json (JsonArray or JsonObject)
-                node.setAttribute(hostVar.getKey(), gson.toJson(hostVar.getValue()));
               }
             }
           }

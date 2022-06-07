@@ -1,0 +1,37 @@
+version: "3.6"
+services:
+
+  ssh-node:
+    build:
+      context: docker/node
+    image: rundeck-ssh-node:latest
+    networks:
+      - rundeck
+    ports:
+      - "2222:22"
+    volumes:
+      - ssh-data:/configuration:rw
+
+  rundeck:
+    build:
+      context: .
+      args:
+        RUNDECK_IMAGE: ${RUNDECK_IMAGE:-rundeck/rundeck:SNAPSHOT}
+    image: rundeck-ansible-plugin:latest
+    command: "-Dansible.debug=false"
+    environment:
+      RUNDECK_GRAILS_URL: http://localhost:4440
+    networks:
+      - rundeck
+    ports:
+      - "4440:4440"
+    volumes:
+    - ${PWD}/docker/inventory.ini:/home/rundeck/data/inventory.ini:rw
+    - ssh-data:/home/rundeck/.ssh:rw
+
+volumes:
+  rundeck-data:
+  ssh-data:
+
+networks:
+  rundeck:

@@ -1,5 +1,9 @@
 package com.rundeck.plugins.ansible.plugin;
 
+import com.dtolabs.rundeck.core.common.INodeEntry;
+import com.dtolabs.rundeck.core.execution.ExecutionContext;
+import com.dtolabs.rundeck.core.execution.proxy.ProxySecretBundleCreator;
+import com.dtolabs.rundeck.core.execution.proxy.SecretBundle;
 import com.rundeck.plugins.ansible.ansible.AnsibleDescribable;
 import com.rundeck.plugins.ansible.ansible.AnsibleException;
 import com.rundeck.plugins.ansible.ansible.AnsibleRunner;
@@ -12,11 +16,13 @@ import com.dtolabs.rundeck.plugins.ServiceNameConstants;
 import com.dtolabs.rundeck.plugins.step.PluginStepContext;
 import com.dtolabs.rundeck.plugins.step.StepPlugin;
 import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
+import com.rundeck.plugins.ansible.util.AnsibleUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Plugin(name = AnsiblePlaybookWorkflowStep.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.WorkflowStep)
-public class AnsiblePlaybookWorkflowStep implements StepPlugin, AnsibleDescribable {
+public class AnsiblePlaybookWorkflowStep implements StepPlugin, AnsibleDescribable, ProxySecretBundleCreator {
 
 	public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsiblePlaybookWorkflowStep";
 
@@ -101,4 +107,14 @@ public class AnsiblePlaybookWorkflowStep implements StepPlugin, AnsibleDescribab
         return DESC;
   }
 
+    @Override
+    public SecretBundle prepareSecretBundle(ExecutionContext context, INodeEntry node) {
+        return null;
+    }
+
+    @Override
+    public SecretBundle prepareSecretBundleWorkflowStep(ExecutionContext context, Map<String, Object> configuration) {
+        AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(context,context.getFramework(),context.getNodes(),configuration);
+        return AnsibleUtil.createBundle(builder);
+    }
 }

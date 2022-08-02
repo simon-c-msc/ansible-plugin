@@ -2,6 +2,7 @@ package com.rundeck.plugins.ansible.util;
 
 import com.dtolabs.rundeck.core.execution.proxy.DefaultSecretBundle;
 import com.dtolabs.rundeck.core.execution.proxy.SecretBundle;
+import com.dtolabs.rundeck.core.plugins.configuration.ConfigurationException;
 import com.dtolabs.utils.Streams;
 
 import java.io.ByteArrayOutputStream;
@@ -20,7 +21,7 @@ public class AnsibleUtil {
                         ansibleRunnerBuilder.getPasswordStorageData()
                 );
             }
-            if(ansibleRunnerBuilder.getPrivateKeyfilePath() != null) {
+            if(ansibleRunnerBuilder.getPrivateKeyStoragePath() != null) {
                 ByteArrayOutputStream pkData = new ByteArrayOutputStream();
                 Streams.copyStream(ansibleRunnerBuilder.getPrivateKeyStorageData(), pkData);
                 secretBundle.addSecret(
@@ -29,8 +30,22 @@ public class AnsibleUtil {
                 );
             }
 
+            if(ansibleRunnerBuilder.getBecomePasswordStoragePath() != null) {
+                secretBundle.addSecret(
+                        ansibleRunnerBuilder.getBecomePasswordStoragePath(),
+                        ansibleRunnerBuilder.getBecomePasswordStorageData()
+                );
+            }
+
+            if(ansibleRunnerBuilder.getPassphraseStoragePath() != null) {
+                secretBundle.addSecret(
+                        ansibleRunnerBuilder.getPassphraseStoragePath(),
+                        ansibleRunnerBuilder.getPasswordStorageData()
+                );
+            }
+
             return secretBundle;
-        } catch(IOException iex) {
+        } catch(IOException | ConfigurationException iex ) {
             throw new RuntimeException("Unable to prepare secret bundle", iex);
         }
     }

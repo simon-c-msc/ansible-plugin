@@ -1,11 +1,17 @@
 package com.rundeck.plugins.ansible.ansible;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
 import com.dtolabs.rundeck.core.common.Framework;
 import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.execution.ExecutionContext;
 import com.dtolabs.rundeck.core.plugins.configuration.ConfigurationException;
+import com.dtolabs.rundeck.core.storage.ResourceMeta;
+import com.dtolabs.rundeck.plugins.step.PluginStepContext;
+import org.rundeck.storage.api.PathUtil;
+import org.rundeck.storage.api.StorageException;
+import com.dtolabs.rundeck.core.storage.keys.KeyStorageTree;
 
 public class PropertyResolver {
     /**
@@ -146,6 +152,16 @@ public class PropertyResolver {
             return option.get(optname);
         }
         return null;
+    }
+
+    public static String getPasswordFromKeyStorage(String path, KeyStorageTree storage) {
+        try{
+            String key = new String(storage.readPassword(path));
+            return key;
+        }catch (Exception e){
+            throw StorageException.readException(PathUtil.asPath(path), "error accessing key storage: ${e.message}");
+        }
+
     }
 
 }

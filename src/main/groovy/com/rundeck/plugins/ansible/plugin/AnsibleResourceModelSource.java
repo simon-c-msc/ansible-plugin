@@ -1,5 +1,6 @@
 package com.rundeck.plugins.ansible.plugin;
 
+import com.dtolabs.rundeck.core.storage.keys.KeyStorageTree;
 import com.rundeck.plugins.ansible.ansible.AnsibleDescribable;
 import com.rundeck.plugins.ansible.ansible.AnsibleDescribable.AuthenticationType;
 import com.rundeck.plugins.ansible.ansible.AnsibleException;
@@ -18,6 +19,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.rundeck.plugins.ansible.ansible.PropertyResolver;
+import org.rundeck.app.spi.Services;
+import org.rundeck.storage.api.PathUtil;
+import org.rundeck.storage.api.StorageException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,6 +39,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
   private String project;
   private String sshAuthType;
+  private Services services;
 
   private HashMap<String, Map<String, String>> configDataContext;
   private Map<String, Map<String, String>> executionDataContext;
@@ -57,6 +63,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
   protected String sshPrivateKeyFile;
   protected String sshPass;
   protected Integer sshTimeout;
+  protected String sshKeyStoragePath;
 
   // ansible become args
   protected Boolean become;
@@ -129,6 +136,8 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
     sshPassword = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_PASSWORD,null,configuration,executionDataContext);
 
+    sshKeyStoragePath = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_KEYPATH_STORAGE_PATH, null, configuration, executionDataContext);
+
     sshTimeout = null;
     String str_sshTimeout = resolveProperty(AnsibleDescribable.ANSIBLE_SSH_TIMEOUT,null,configuration,executionDataContext);
     if ( str_sshTimeout != null ) {
@@ -179,6 +188,16 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
           sshPrivateKey = new String(Files.readAllBytes(Paths.get(sshPrivateKeyFile)));
         } catch (IOException e) {
           throw new ResourceModelSourceException("Could not read privatekey file " + sshPrivateKeyFile,e);
+        }
+        runner = runner.sshPrivateKey(sshPrivateKey);
+      }
+      if (sshKeyStoragePath != null && sshPrivateKeyFile == null) {
+        String sshPrivateKey;
+        try {
+          KeyStorageTree keyStorage = services.getService(KeyStorageTree.class);
+          sshPrivateKey =  PropertyResolver.getPasswordFromKeyStorage(sshKeyStoragePath, keyStorage);
+        } catch (StorageException e) {
+          throw StorageException.readException(PathUtil.asPath(sshKeyStoragePath), "error accessing key storage: ${e.message}");
         }
         runner = runner.sshPrivateKey(sshPrivateKey);
       }

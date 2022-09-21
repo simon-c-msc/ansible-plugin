@@ -47,6 +47,7 @@ public class AnsibleResourceModelSourceFactory implements ResourceModelSourceFac
         builder.property(SSH_PASSWORD_PROP);
         builder.property(SSH_KEY_FILE_PROP);
         builder.property(SSH_TIMEOUT_PROP);
+        builder.property(SSH_KEY_STORAGE_PROP);
         builder.property(BECOME_PROP);
         builder.property(BECOME_AUTH_TYPE_PROP);
         builder.property(BECOME_USER_PROP);

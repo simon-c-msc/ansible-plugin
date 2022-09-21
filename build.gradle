@@ -46,7 +46,7 @@ configurations {
 dependencies {
   pluginLibs 'com.google.code.gson:gson:2.8.6'
   implementation 'org.codehaus.groovy:groovy-all:2.5.6'
-  implementation 'org.rundeck:rundeck-core:3.0.1-20180803'
+  implementation 'org.rundeck:rundeck-core:4.6.0-20220906'
 }
 
 task copyToLib(type: Copy) {

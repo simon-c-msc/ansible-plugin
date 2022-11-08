@@ -3,51 +3,45 @@ package com.rundeck.plugins.ansible.util;
 import com.dtolabs.rundeck.core.execution.proxy.DefaultSecretBundle;
 import com.dtolabs.rundeck.core.execution.proxy.SecretBundle;
 import com.dtolabs.rundeck.core.plugins.configuration.ConfigurationException;
-import com.dtolabs.utils.Streams;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import com.rundeck.plugins.ansible.ansible.AnsibleRunnerBuilder;
+
+import java.io.IOException;
 
 public class AnsibleUtil {
 
-    public static SecretBundle createBundle(AnsibleRunnerBuilder ansibleRunnerBuilder)  {
+
+    public static SecretBundle createBundle(AnsibleRunnerBuilder builder){
+
+        DefaultSecretBundle secretBundle = new DefaultSecretBundle();
+
         try {
-            DefaultSecretBundle secretBundle = new DefaultSecretBundle();
-
-            if(ansibleRunnerBuilder.getPasswordStoragePath() != null) {
+            if(builder.getPasswordStoragePath()!=null){
                 secretBundle.addSecret(
-                        ansibleRunnerBuilder.getPasswordStoragePath(),
-                        ansibleRunnerBuilder.getPasswordStorageData()
-                );
-            }
-            if(ansibleRunnerBuilder.getPrivateKeyStoragePath() != null) {
-                ByteArrayOutputStream pkData = new ByteArrayOutputStream();
-                Streams.copyStream(ansibleRunnerBuilder.getPrivateKeyStorageData(), pkData);
-                secretBundle.addSecret(
-                        ansibleRunnerBuilder.getPrivateKeyStoragePath(),
-                        pkData.toByteArray()
+                        builder.getPasswordStoragePath(),
+                        builder.getPasswordStorageData()
                 );
             }
 
-            if(ansibleRunnerBuilder.getBecomePasswordStoragePath() != null) {
+            if(builder.getPrivateKeyStoragePath()!=null){
                 secretBundle.addSecret(
-                        ansibleRunnerBuilder.getBecomePasswordStoragePath(),
-                        ansibleRunnerBuilder.getBecomePasswordStorageData()
+                        builder.getPrivateKeyStoragePath(),
+                        builder.getPrivateKeyStorageDataBytes()
                 );
             }
 
-            if(ansibleRunnerBuilder.getPassphraseStoragePath() != null) {
+            if(builder.getBecomePasswordStoragePath()!=null){
                 secretBundle.addSecret(
-                        ansibleRunnerBuilder.getPassphraseStoragePath(),
-                        ansibleRunnerBuilder.getPasswordStorageData()
+                        builder.getBecomePasswordStoragePath(),
+                        builder.getBecomePasswordStorageData()
                 );
             }
 
             return secretBundle;
-        } catch(IOException | ConfigurationException iex ) {
-            throw new RuntimeException("Unable to prepare secret bundle", iex);
-        }
-    }
 
+        } catch (Exception e) {
+            return null;
+        }
+
+
+    }
 }

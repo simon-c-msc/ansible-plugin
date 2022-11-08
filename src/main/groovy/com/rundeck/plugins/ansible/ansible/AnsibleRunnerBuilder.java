@@ -123,6 +123,11 @@ public class AnsibleRunnerBuilder {
                 .getInputStream();
     }
 
+    public  byte[] getPrivateKeyStorageDataBytes() throws IOException {
+        String privateKeyResourcePath = getPrivateKeyStoragePath();
+        return this.loadStoragePathData(privateKeyResourcePath);
+    }
+
 
     public String getPasswordStoragePath() {
 

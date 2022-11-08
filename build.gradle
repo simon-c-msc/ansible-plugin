@@ -1,5 +1,5 @@
 plugins {
-  id 'pl.allegro.tech.build.axion-release' version '1.13.6'
+  id 'pl.allegro.tech.build.axion-release' version '1.14.2'
 }
 
 group 'com.rundeck'
@@ -46,7 +46,7 @@ configurations {
 dependencies {
   pluginLibs 'com.google.code.gson:gson:2.8.6'
   implementation 'org.codehaus.groovy:groovy-all:2.5.6'
-  implementation 'org.rundeck:rundeck-core:3.0.1-20180803'
+  implementation 'org.rundeck:rundeck-core:4.6.1-20220914'
 }
 
 task copyToLib(type: Copy) {

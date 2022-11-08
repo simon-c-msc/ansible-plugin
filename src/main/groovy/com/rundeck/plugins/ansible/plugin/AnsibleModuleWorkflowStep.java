@@ -108,7 +108,7 @@ public class AnsibleModuleWorkflowStep implements StepPlugin, AnsibleDescribable
         return null;
     }
 
-    @Override
+    //@Override
     public SecretBundle prepareSecretBundleWorkflowStep(ExecutionContext context, Map<String, Object> configuration) {
         AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(context,context.getFramework(),context.getNodes(),configuration);
         return AnsibleUtil.createBundle(builder);

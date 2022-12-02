@@ -101,17 +101,17 @@ public class AnsiblePlaybookWorflowNodeStep implements NodeStepPlugin, AnsibleDe
     }
 
     @Override
-    public SecretBundle prepareSecretBundle(ExecutionContext context, INodeEntry node) {
-        Map<String, Object> jobConf = new HashMap<>();
-        jobConf.put(AnsibleDescribable.ANSIBLE_LIMIT,node.getNodename());
+    public SecretBundle prepareSecretBundleWorkflowNodeStep(ExecutionContext context, INodeEntry node, Map<String, Object> configuration) {
+//        Map<String, Object> jobConf = new HashMap<>();
+//        jobConf.put(AnsibleDescribable.ANSIBLE_LIMIT,node.getNodename());
+//
+//        if ("true".equals(System.getProperty("ansible.debug"))) {
+//            jobConf.put(AnsibleDescribable.ANSIBLE_DEBUG,"True");
+//        } else {
+//            jobConf.put(AnsibleDescribable.ANSIBLE_DEBUG,"False");
+//        }
 
-        if ("true".equals(System.getProperty("ansible.debug"))) {
-            jobConf.put(AnsibleDescribable.ANSIBLE_DEBUG,"True");
-        } else {
-            jobConf.put(AnsibleDescribable.ANSIBLE_DEBUG,"False");
-        }
-
-        AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(node, context, context.getFramework(), jobConf);
+        AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(node, context, context.getFramework(), configuration);
         return AnsibleUtil.createBundle(builder);
     }
 }

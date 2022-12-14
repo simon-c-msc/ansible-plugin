@@ -70,7 +70,6 @@ public class AnsiblePlaybookWorflowNodeStep implements NodeStepPlugin, AnsibleDe
 
         AnsibleRunner runner = null;
 
-
         configuration.put(AnsibleDescribable.ANSIBLE_LIMIT,entry.getNodename());
         // set log level
         if (context.getDataContext().get("job").get("loglevel").equals("DEBUG")) {
@@ -100,18 +99,14 @@ public class AnsiblePlaybookWorflowNodeStep implements NodeStepPlugin, AnsibleDe
         builder.cleanupTempFiles();
     }
 
-    @Override
+    //@Override
     public SecretBundle prepareSecretBundleWorkflowNodeStep(ExecutionContext context, INodeEntry node, Map<String, Object> configuration) {
-//        Map<String, Object> jobConf = new HashMap<>();
-//        jobConf.put(AnsibleDescribable.ANSIBLE_LIMIT,node.getNodename());
-//
-//        if ("true".equals(System.getProperty("ansible.debug"))) {
-//            jobConf.put(AnsibleDescribable.ANSIBLE_DEBUG,"True");
-//        } else {
-//            jobConf.put(AnsibleDescribable.ANSIBLE_DEBUG,"False");
-//        }
-
         AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(node, context, context.getFramework(), configuration);
         return AnsibleUtil.createBundle(builder);
+    }
+
+    @Override
+    public SecretBundle prepareSecretBundle(ExecutionContext context, INodeEntry node) {
+        return null;
     }
 }

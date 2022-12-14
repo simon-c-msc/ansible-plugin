@@ -93,20 +93,29 @@ public class AnsiblePlaybookInlineWorkflowNodeStep implements NodeStepPlugin, An
         try {
             runner.run();
         } catch (AnsibleException e) {
-            throw new NodeStepException(e.getMessage(), e.getFailureReason(),e.getMessage());
+            Map<String,Object> failureData = new HashMap<>();
+            failureData.put("message",e.getMessage());
+            failureData.put("ansible-config", builder.getConfigFile());
+            throw new NodeStepException(e.getMessage(), e, e.getFailureReason(), failureData, e.getMessage());
         } catch (Exception e) {
-            throw new NodeStepException(e.getMessage(),AnsibleException.AnsibleFailureReason.AnsibleError,e.getMessage());
+            Map<String,Object> failureData = new HashMap<>();
+            failureData.put("message",e.getMessage());
+            failureData.put("ansible-config", builder.getConfigFile());
+            throw new NodeStepException(e.getMessage(),e, AnsibleException.AnsibleFailureReason.AnsibleError, failureData, e.getMessage());
         }
 
         builder.cleanupTempFiles();
 
     }
 
-    @Override
+    //@Override
     public SecretBundle prepareSecretBundleWorkflowNodeStep(ExecutionContext context, INodeEntry node, Map<String, Object> configuration) {
-        Map<String, Object> jobConf = new HashMap<>();
-        jobConf.put(AnsibleDescribable.ANSIBLE_LIMIT,node.getNodename());
         AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(node, context, context.getFramework(), configuration);
         return AnsibleUtil.createBundle(builder);
+    }
+
+    @Override
+    public SecretBundle prepareSecretBundle(ExecutionContext context, INodeEntry node) {
+        return null;
     }
 }

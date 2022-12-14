@@ -20,15 +20,16 @@ apply plugin: 'groovy'
 apply plugin: 'java'
 sourceCompatibility = 1.8
 
-scmVersion {
-    ignoreUncommittedChanges = true
-    tag {
-        prefix = 'v'
-        versionSeparator = ''
-    }
-}
+//scmVersion {
+//    ignoreUncommittedChanges = true
+//    tag {
+//        prefix = 'v'
+//        versionSeparator = ''
+//    }
+//}
 
-version = scmVersion.version
+//version = scmVersion.version
+version = "3.3-SNAPSHOT"
 
 repositories {
   mavenCentral()
@@ -46,7 +47,15 @@ configurations {
 dependencies {
   pluginLibs 'com.google.code.gson:gson:2.8.6'
   implementation 'org.codehaus.groovy:groovy-all:2.5.6'
-  implementation 'org.rundeck:rundeck-core:4.6.1-20220914'
+
+
+  if (findProject(":core")) {
+    implementation project(":core")
+  } else {
+    implementation('org.rundeck:rundeck-core:4.6.1-20220914'){
+      //exclude(group:"org.rundeck",module:"rundeck-data-model")
+    }
+  }
 }
 
 task copyToLib(type: Copy) {

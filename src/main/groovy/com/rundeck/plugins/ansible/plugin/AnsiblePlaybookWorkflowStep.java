@@ -94,9 +94,17 @@ public class AnsiblePlaybookWorkflowStep implements StepPlugin, AnsibleDescribab
     try {
         runner.run();
     } catch (AnsibleException e) {
-        throw new StepException(e.getMessage(), e, e.getFailureReason());
+        Map<String,Object> failureData = new HashMap<>();
+        failureData.put("message",e.getMessage());
+        failureData.put("ansible-config", builder.getConfigFile());
+
+        throw new StepException(e.getMessage(), e, e.getFailureReason(), failureData);
     } catch (Exception e) {
-        throw new StepException(e.getMessage(),e,AnsibleException.AnsibleFailureReason.AnsibleError);
+        Map<String,Object> failureData = new HashMap<>();
+        failureData.put("message",e.getMessage());
+        failureData.put("ansible-config", builder.getConfigFile());
+
+        throw new StepException(e.getMessage(),e,AnsibleException.AnsibleFailureReason.AnsibleError, failureData);
     }
 
     builder.cleanupTempFiles();

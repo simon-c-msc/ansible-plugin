@@ -24,9 +24,9 @@ import java.util.Map;
 @Plugin(name = AnsiblePlaybookWorkflowStep.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.WorkflowStep)
 public class AnsiblePlaybookWorkflowStep implements StepPlugin, AnsibleDescribable, ProxySecretBundleCreator {
 
-	public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsiblePlaybookWorkflowStep";
+    public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsiblePlaybookWorkflowStep";
 
-	public static Description DESC = null;
+    public static Description DESC = null;
 
     static {
         DescriptionBuilder builder = DescriptionBuilder.builder();
@@ -57,72 +57,67 @@ public class AnsiblePlaybookWorkflowStep implements StepPlugin, AnsibleDescribab
         builder.property(BECOME_PASSWORD_STORAGE_PROP);
         builder.property(DISABLE_LIMIT_PROP);
 
-        DESC=builder.build();
+        DESC = builder.build();
     }
-
-  @Override
-  public void executeStep(PluginStepContext context, Map<String, Object> configuration) throws StepException {
-
-    AnsibleRunner runner = null;
-
-    // set targets
-    StringBuilder nodes = new StringBuilder();
-    for(String node : context.getNodes().getNodeNames()) {
-    	nodes.append(node);
-    	nodes.append(",");
-    }
-    String limit = nodes.length() > 0 ? nodes.substring(0, nodes.length() - 1): "";
-    if (limit != "") {
-        configuration.put(AnsibleDescribable.ANSIBLE_LIMIT,limit);
-    }
-    // set log level
-    if (context.getDataContext().get("job").get("loglevel").equals("DEBUG")) {
-        configuration.put(AnsibleDescribable.ANSIBLE_DEBUG,"True");
-    } else {
-        configuration.put(AnsibleDescribable.ANSIBLE_DEBUG,"False");
-    }
-
-    AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(context.getExecutionContext(),context.getFramework(),context.getNodes(),configuration);
-
-    try {
-        runner = builder.buildAnsibleRunner();
-    } catch (ConfigurationException e) {
-          throw new StepException("Error configuring Ansible runner: "+e.getMessage(), e, AnsibleException.AnsibleFailureReason.ParseArgumentsError);
-    }
-
-    // ansible runner will take care of handling exceptions, here handle only jobs specific stuff
-    try {
-        runner.run();
-    } catch (AnsibleException e) {
-        Map<String,Object> failureData = new HashMap<>();
-        failureData.put("message",e.getMessage());
-        failureData.put("ansible-config", builder.getConfigFile());
-
-        throw new StepException(e.getMessage(), e, e.getFailureReason(), failureData);
-    } catch (Exception e) {
-        Map<String,Object> failureData = new HashMap<>();
-        failureData.put("message",e.getMessage());
-        failureData.put("ansible-config", builder.getConfigFile());
-
-        throw new StepException(e.getMessage(),e,AnsibleException.AnsibleFailureReason.AnsibleError, failureData);
-    }
-
-    builder.cleanupTempFiles();
-  }
-
-  @Override
-  public Description getDescription() {
-        return DESC;
-  }
 
     @Override
-    public SecretBundle prepareSecretBundle(ExecutionContext context, INodeEntry node) {
-        return null;
+    public void executeStep(PluginStepContext context, Map<String, Object> configuration) throws StepException {
+
+        AnsibleRunner runner = null;
+
+        // set targets
+        StringBuilder nodes = new StringBuilder();
+        for (String node : context.getNodes().getNodeNames()) {
+            nodes.append(node);
+            nodes.append(",");
+        }
+        String limit = nodes.length() > 0 ? nodes.substring(0, nodes.length() - 1) : "";
+        if (limit != "") {
+            configuration.put(AnsibleDescribable.ANSIBLE_LIMIT, limit);
+        }
+        // set log level
+        if (context.getDataContext().get("job").get("loglevel").equals("DEBUG")) {
+            configuration.put(AnsibleDescribable.ANSIBLE_DEBUG, "True");
+        } else {
+            configuration.put(AnsibleDescribable.ANSIBLE_DEBUG, "False");
+        }
+
+        AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(context.getExecutionContext(), context.getFramework(), context.getNodes(), configuration);
+
+        try {
+            runner = builder.buildAnsibleRunner();
+        } catch (ConfigurationException e) {
+            throw new StepException("Error configuring Ansible runner: " + e.getMessage(), e, AnsibleException.AnsibleFailureReason.ParseArgumentsError);
+        }
+
+        // ansible runner will take care of handling exceptions, here handle only jobs specific stuff
+        try {
+            runner.run();
+        } catch (AnsibleException e) {
+            Map<String, Object> failureData = new HashMap<>();
+            failureData.put("message", e.getMessage());
+            failureData.put("ansible-config", builder.getConfigFile());
+
+            throw new StepException(e.getMessage(), e, e.getFailureReason(), failureData);
+        } catch (Exception e) {
+            Map<String, Object> failureData = new HashMap<>();
+            failureData.put("message", e.getMessage());
+            failureData.put("ansible-config", builder.getConfigFile());
+
+            throw new StepException(e.getMessage(), e, AnsibleException.AnsibleFailureReason.AnsibleError, failureData);
+        }
+
+        builder.cleanupTempFiles();
     }
 
-    //@Override
+    @Override
+    public Description getDescription() {
+        return DESC;
+    }
+
+    @Override
     public SecretBundle prepareSecretBundleWorkflowStep(ExecutionContext context, Map<String, Object> configuration) {
-        AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(context,context.getFramework(),context.getNodes(),configuration);
+        AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(context, context.getFramework(), context.getNodes(), configuration);
         return AnsibleUtil.createBundle(builder);
     }
 }

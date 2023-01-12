@@ -108,14 +108,10 @@ public class AnsiblePlaybookInlineWorkflowNodeStep implements NodeStepPlugin, An
 
     }
 
-    //@Override
+    @Override
     public SecretBundle prepareSecretBundleWorkflowNodeStep(ExecutionContext context, INodeEntry node, Map<String, Object> configuration) {
         AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(node, context, context.getFramework(), configuration);
         return AnsibleUtil.createBundle(builder);
     }
 
-    @Override
-    public SecretBundle prepareSecretBundle(ExecutionContext context, INodeEntry node) {
-        return null;
-    }
 }

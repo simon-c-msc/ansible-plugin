@@ -1,5 +1,8 @@
 package com.rundeck.plugins.ansible.plugin;
 
+import com.dtolabs.rundeck.core.execution.ExecutionContext;
+import com.dtolabs.rundeck.core.execution.proxy.ProxySecretBundleCreator;
+import com.dtolabs.rundeck.core.execution.proxy.SecretBundle;
 import com.rundeck.plugins.ansible.ansible.AnsibleDescribable;
 import com.rundeck.plugins.ansible.ansible.AnsibleException;
 import com.rundeck.plugins.ansible.ansible.AnsibleRunner;
@@ -13,11 +16,13 @@ import com.dtolabs.rundeck.plugins.ServiceNameConstants;
 import com.dtolabs.rundeck.plugins.step.NodeStepPlugin;
 import com.dtolabs.rundeck.plugins.step.PluginStepContext;
 import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
+import com.rundeck.plugins.ansible.util.AnsibleUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Plugin(name = AnsiblePlaybookInlineWorkflowNodeStep.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.WorkflowNodeStep)
-public class AnsiblePlaybookInlineWorkflowNodeStep implements NodeStepPlugin, AnsibleDescribable {
+public class AnsiblePlaybookInlineWorkflowNodeStep implements NodeStepPlugin, AnsibleDescribable, ProxySecretBundleCreator {
 
     public static final String SERVICE_PROVIDER_NAME = "com.batix.rundeck.plugins.AnsiblePlaybookInlineWorkflowNodeStep";
 
@@ -88,12 +93,25 @@ public class AnsiblePlaybookInlineWorkflowNodeStep implements NodeStepPlugin, An
         try {
             runner.run();
         } catch (AnsibleException e) {
-            throw new NodeStepException(e.getMessage(), e.getFailureReason(),e.getMessage());
+            Map<String,Object> failureData = new HashMap<>();
+            failureData.put("message",e.getMessage());
+            failureData.put("ansible-config", builder.getConfigFile());
+            throw new NodeStepException(e.getMessage(), e, e.getFailureReason(), failureData, e.getMessage());
         } catch (Exception e) {
-            throw new NodeStepException(e.getMessage(),AnsibleException.AnsibleFailureReason.AnsibleError,e.getMessage());
+            Map<String,Object> failureData = new HashMap<>();
+            failureData.put("message",e.getMessage());
+            failureData.put("ansible-config", builder.getConfigFile());
+            throw new NodeStepException(e.getMessage(),e, AnsibleException.AnsibleFailureReason.AnsibleError, failureData, e.getMessage());
         }
 
         builder.cleanupTempFiles();
 
     }
+
+    @Override
+    public SecretBundle prepareSecretBundleWorkflowNodeStep(ExecutionContext context, INodeEntry node, Map<String, Object> configuration) {
+        AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(node, context, context.getFramework(), configuration);
+        return AnsibleUtil.createBundle(builder);
+    }
+
 }

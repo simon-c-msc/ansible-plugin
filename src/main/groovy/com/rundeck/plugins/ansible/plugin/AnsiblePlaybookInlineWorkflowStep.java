@@ -1,6 +1,5 @@
 package com.rundeck.plugins.ansible.plugin;
 
-import com.dtolabs.rundeck.core.common.INodeEntry;
 import com.dtolabs.rundeck.core.execution.ExecutionContext;
 import com.dtolabs.rundeck.core.execution.proxy.ProxySecretBundleCreator;
 import com.dtolabs.rundeck.core.execution.proxy.SecretBundle;
@@ -19,6 +18,7 @@ import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 import com.rundeck.plugins.ansible.util.AnsibleUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Plugin(name = AnsiblePlaybookInlineWorkflowStep.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.WorkflowStep)
@@ -120,5 +120,11 @@ public class AnsiblePlaybookInlineWorkflowStep implements StepPlugin, AnsibleDes
     public SecretBundle prepareSecretBundleWorkflowStep(ExecutionContext context, Map<String, Object> configuration) {
         AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(context, context.getFramework(), context.getNodes(), configuration);
         return AnsibleUtil.createBundle(builder);
+    }
+
+    @Override
+    public List<String> listSecretsPathWorkflowStep(ExecutionContext context, Map<String, Object> configuration) {
+        AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(context, context.getFramework(), context.getNodes(), configuration);
+        return AnsibleUtil.getSecretsPath(builder);
     }
 }

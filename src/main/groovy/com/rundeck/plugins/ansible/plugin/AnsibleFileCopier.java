@@ -22,6 +22,7 @@ import com.rundeck.plugins.ansible.util.AnsibleUtil;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Plugin(name = AnsibleFileCopier.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.FileCopier)
@@ -180,6 +181,15 @@ public class AnsibleFileCopier implements FileCopier, AnsibleDescribable, ProxyS
 
         AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(node, context, context.getFramework(), jobConf);
         return AnsibleUtil.createBundle(builder);
+    }
+
+    @Override
+    public List<String> listSecretsPath(ExecutionContext context, INodeEntry node) {
+        Map<String, Object> jobConf = new HashMap<>();
+        jobConf.put(AnsibleDescribable.ANSIBLE_LIMIT,node.getNodename());
+        AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(node, context, context.getFramework(), jobConf);
+
+        return AnsibleUtil.getSecretsPath(builder);
     }
 }
 

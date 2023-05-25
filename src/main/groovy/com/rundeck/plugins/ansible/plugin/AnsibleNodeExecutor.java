@@ -20,6 +20,7 @@ import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 import com.rundeck.plugins.ansible.util.AnsibleUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Plugin(name = AnsibleNodeExecutor.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.NodeExecutor)
@@ -202,6 +203,15 @@ public class AnsibleNodeExecutor implements NodeExecutor, AnsibleDescribable, Pr
 
         AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(node, context, context.getFramework(), jobConf);
         return AnsibleUtil.createBundle(builder);
+    }
+
+    @Override
+    public List<String> listSecretsPath(ExecutionContext context, INodeEntry node) {
+        Map<String, Object> jobConf = new HashMap<>();
+        jobConf.put(AnsibleDescribable.ANSIBLE_LIMIT,node.getNodename());
+        AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(node, context, context.getFramework(), jobConf);
+
+        return AnsibleUtil.getSecretsPath(builder);
     }
 }
 

@@ -1,5 +1,5 @@
 plugins {
-  id 'pl.allegro.tech.build.axion-release' version '1.14.2'
+  id 'pl.allegro.tech.build.axion-release' version '1.15.1'
 }
 
 group 'com.rundeck'
@@ -16,7 +16,6 @@ ext.pluginClassNames = [
   'com.rundeck.plugins.ansible.plugin.AnsiblePlaybookInlineWorkflowNodeStep'
 ].join(',')
 
-apply plugin: 'groovy'
 apply plugin: 'java'
 sourceCompatibility = 1.8
 
@@ -44,8 +43,7 @@ configurations {
 }
 
 dependencies {
-  pluginLibs 'com.google.code.gson:gson:2.8.6'
-  implementation 'org.codehaus.groovy:groovy-all:2.5.6'
+  pluginLibs 'com.google.code.gson:gson:2.10.1'
   implementation('org.rundeck:rundeck-core:4.9.0-20230111')
 }
 

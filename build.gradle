@@ -1,8 +1,9 @@
 plugins {
   id 'pl.allegro.tech.build.axion-release' version '1.14.2'
+  id 'maven-publish'
 }
 
-group 'com.rundeck'
+group = 'com.github.rundeck-plugins'
 
 ext.rundeckPluginVersion = '1.2'
 ext.pluginClassNames = [
@@ -16,8 +17,8 @@ ext.pluginClassNames = [
   'com.rundeck.plugins.ansible.plugin.AnsiblePlaybookInlineWorkflowNodeStep'
 ].join(',')
 
-apply plugin: 'groovy'
 apply plugin: 'java'
+apply plugin: 'groovy'
 sourceCompatibility = 1.8
 
 scmVersion {
@@ -44,9 +45,9 @@ configurations {
 }
 
 dependencies {
-  pluginLibs 'com.google.code.gson:gson:2.8.6'
-  implementation 'org.codehaus.groovy:groovy-all:2.5.6'
+  pluginLibs 'com.google.code.gson:gson:2.10.1'
   implementation('org.rundeck:rundeck-core:4.9.0-20230111')
+  implementation 'org.codehaus.groovy:groovy-all:3.0.9'
 }
 
 task copyToLib(type: Copy) {
@@ -74,4 +75,13 @@ jar {
     attributes 'Rundeck-Plugin-URL': 'https://github.com/rundeck-plugins/ansible-plugin'
   }
   dependsOn(copyToLib)
+}
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      artifactId = 'ansible-plugin'
+      from components.java
+    }
+  }
 }

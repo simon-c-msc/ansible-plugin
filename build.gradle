@@ -18,6 +18,7 @@ ext.pluginClassNames = [
 ].join(',')
 
 apply plugin: 'java'
+apply plugin: 'groovy'
 sourceCompatibility = 1.8
 
 scmVersion {
@@ -46,6 +47,7 @@ configurations {
 dependencies {
   pluginLibs 'com.google.code.gson:gson:2.10.1'
   implementation('org.rundeck:rundeck-core:4.9.0-20230111')
+  implementation 'org.codehaus.groovy:groovy-all:3.0.9'
 }
 
 task copyToLib(type: Copy) {

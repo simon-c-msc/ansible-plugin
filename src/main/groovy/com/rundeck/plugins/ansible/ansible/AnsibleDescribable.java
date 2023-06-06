@@ -222,7 +222,7 @@ public interface AnsibleDescribable extends Describable {
               ANSIBLE_EXECUTABLE,
               "Executable",
               "Change the remote shell used to execute the command. Should be an absolute path to the executable.",
-              true,
+              false,
               null,
               Arrays.asList(Executable.getValues())
     );

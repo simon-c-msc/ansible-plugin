@@ -18,7 +18,7 @@ import com.dtolabs.rundeck.plugins.step.PluginStepContext;
 import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
 import com.rundeck.plugins.ansible.util.AnsibleUtil;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Plugin(name = AnsiblePlaybookWorflowNodeStep.SERVICE_PROVIDER_NAME, service = ServiceNameConstants.WorkflowNodeStep)
@@ -105,4 +105,9 @@ public class AnsiblePlaybookWorflowNodeStep implements NodeStepPlugin, AnsibleDe
         return AnsibleUtil.createBundle(builder);
     }
 
+    @Override
+    public List<String> listSecretsPathWorkflowNodeStep(ExecutionContext context, INodeEntry node, Map<String, Object> configuration) {
+        AnsibleRunnerBuilder builder = new AnsibleRunnerBuilder(node, context, context.getFramework(), configuration);
+        return AnsibleUtil.getSecretsPath(builder);
+    }
 }

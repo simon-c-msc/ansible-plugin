@@ -1,5 +1,11 @@
 package com.rundeck.plugins.ansible.plugin;
 
+import com.dtolabs.rundeck.core.execution.proxy.DefaultSecretBundle;
+import com.dtolabs.rundeck.core.execution.proxy.ProxySecretBundleCreator;
+import com.dtolabs.rundeck.core.execution.proxy.SecretBundle;
+import com.dtolabs.rundeck.core.storage.ResourceMeta;
+import com.dtolabs.rundeck.core.storage.StorageTree;
+import com.dtolabs.rundeck.core.storage.keys.KeyStorageTree;
 import com.rundeck.plugins.ansible.ansible.AnsibleDescribable;
 import com.rundeck.plugins.ansible.ansible.AnsibleDescribable.AuthenticationType;
 import com.rundeck.plugins.ansible.ansible.AnsibleException;
@@ -18,8 +24,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import org.rundeck.app.spi.Services;
+import org.rundeck.storage.api.PathUtil;
+import org.rundeck.storage.api.StorageException;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -28,9 +38,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class AnsibleResourceModelSource implements ResourceModelSource {
+public class AnsibleResourceModelSource implements ResourceModelSource, ProxySecretBundleCreator {
 
   private Framework framework;
+
+  private Services services;
 
   private String project;
   private String sshAuthType;
@@ -55,6 +67,9 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
   protected Boolean sshUsePassword;
   protected String sshPassword;
   protected String sshPrivateKeyFile;
+
+  protected String sshPasswordPath;
+  protected String sshPrivateKeyPath;
   protected String sshPass;
   protected Integer sshTimeout;
 
@@ -97,6 +112,10 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
       if (hostVar.startsWith(specialVarString)) return true;
     }
     return false;
+  }
+
+  public void setServices(Services services) {
+    this.services = services;
   }
 
   public void configure(Properties configuration) throws ConfigurationException {
@@ -156,6 +175,10 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
     extraParameters = (String)  resolveProperty(AnsibleDescribable.ANSIBLE_EXTRA_PARAM,null,configuration,executionDataContext);
 
+    sshPasswordPath = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_PASSWORD_STORAGE_PATH,null,configuration,executionDataContext);
+    sshPrivateKeyPath = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_KEYPATH_STORAGE_PATH,null,configuration,executionDataContext);
+
+
   }
 
   public AnsibleRunner buildAnsibleRunner() throws ResourceModelSourceException{
@@ -172,6 +195,9 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
       runner.limit(limitList);
     }
 
+    StorageTree storageTree = services.getService(KeyStorageTree.class);
+
+
     if ( sshAuthType.equalsIgnoreCase(AuthenticationType.privateKey.name()) ) {
       if (sshPrivateKeyFile != null) {
         String sshPrivateKey;
@@ -182,9 +208,28 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
         }
         runner = runner.sshPrivateKey(sshPrivateKey);
       }
+
+      if(sshPrivateKeyPath !=null && !sshPrivateKeyPath.isEmpty()){
+        try {
+          String sshPrivateKey = getStorageContentString(sshPrivateKeyPath, storageTree);
+          runner = runner.sshPrivateKey(sshPrivateKey);
+        } catch (ConfigurationException e) {
+          throw new ResourceModelSourceException("Could not read password from storage path " + sshPasswordPath,e);
+        }
+      }
+
     } else if ( sshAuthType.equalsIgnoreCase(AuthenticationType.password.name()) ) {
       if (sshPassword != null) {
         runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
+      }
+
+      if(sshPasswordPath !=null && !sshPasswordPath.isEmpty()){
+        try {
+          sshPassword = getStorageContentString(sshPasswordPath, storageTree);
+          runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
+        } catch (ConfigurationException e) {
+          throw new ResourceModelSourceException("Could not read password from storage path " + sshPasswordPath,e);
+        }
       }
     }
 
@@ -248,6 +293,9 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
       if (extraParameters != null){
         runner.extraParams(extraParameters);
       }
+
+
+
 
     return runner;
   }
@@ -534,4 +582,79 @@ public class AnsibleResourceModelSource implements ResourceModelSource {
 
     return nodes;
   }
+
+
+
+  private String getStorageContentString(String storagePath, StorageTree storageTree) throws ConfigurationException {
+    return new String(this.getStorageContent(storagePath, storageTree));
+  }
+
+  private byte[] getStorageContent(String storagePath, StorageTree storageTree) throws ConfigurationException {
+    org.rundeck.storage.api.Path path = PathUtil.asPath(storagePath);
+    try {
+      ResourceMeta contents = storageTree.getResource(path).getContents();
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      contents.writeContent(byteArrayOutputStream);
+      return byteArrayOutputStream.toByteArray();
+    } catch (StorageException e) {
+      throw new ConfigurationException("Failed to read the ssh private key for " +
+              "storage path: " + storagePath + ": " + e.getMessage());
+    } catch (IOException e) {
+      throw new ConfigurationException("Failed to read the ssh private key for " +
+              "storage path: " + storagePath + ": " + e.getMessage());
+    }
+  }
+
+
+  @Override
+  List<String> listSecretsPathResourceModel(Map<String, Object> configuration){
+    List<String> keys = new ArrayList<>();
+
+    String passwordStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_SSH_PASSWORD_STORAGE_PATH);
+    String privateKeyStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_SSH_KEYPATH_STORAGE_PATH);
+
+    if(passwordStoragePath!=null){
+      keys.add(passwordStoragePath);
+    }
+
+    if(privateKeyStoragePath!=null){
+      keys.add(privateKeyStoragePath);
+    }
+
+    return null;
+
+  }
+
+  @Override
+  SecretBundle prepareSecretBundleResourceModel(Services services, Map<String, Object> configuration){
+    DefaultSecretBundle secretBundle = new DefaultSecretBundle();
+
+    try {
+      StorageTree storageTree = services.getService(KeyStorageTree.class);
+
+      String passwordStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_SSH_PASSWORD_STORAGE_PATH);
+      String privateKeyStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_SSH_KEYPATH_STORAGE_PATH);
+
+      if(passwordStoragePath!=null){
+        secretBundle.addSecret(
+                passwordStoragePath,
+                getStorageContent(passwordStoragePath,storageTree )
+        );
+      }
+
+      if(privateKeyStoragePath!=null){
+        secretBundle.addSecret(
+                privateKeyStoragePath,
+                getStorageContent(privateKeyStoragePath,storageTree )
+        );
+      }
+
+      return secretBundle;
+
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+
 }

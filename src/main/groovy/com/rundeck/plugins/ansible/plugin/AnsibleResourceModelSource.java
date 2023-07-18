@@ -606,8 +606,8 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
   }
 
 
-  @Override
-  List<String> listSecretsPathResourceModel(Map<String, Object> configuration){
+  //@Override
+  public List<String> listSecretsPathResourceModel(Map<String, Object> configuration){
     List<String> keys = new ArrayList<>();
 
     String passwordStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_SSH_PASSWORD_STORAGE_PATH);
@@ -625,8 +625,8 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
 
   }
 
-  @Override
-  SecretBundle prepareSecretBundleResourceModel(Services services, Map<String, Object> configuration){
+  //@Override
+  public SecretBundle prepareSecretBundleResourceModel(Services services, Map<String, Object> configuration){
     DefaultSecretBundle secretBundle = new DefaultSecretBundle();
 
     try {
@@ -652,7 +652,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
       return secretBundle;
 
     } catch (Exception e) {
-      return null;
+      throw new RuntimeException(e.getMessage());
     }
   }
 

@@ -621,7 +621,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
       keys.add(privateKeyStoragePath);
     }
 
-    return null;
+    return keys;
 
   }
 

@@ -650,7 +650,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
   }
 
 
-  //@Override
+  @Override
   public List<String> listSecretsPathResourceModel(Map<String, Object> configuration){
     List<String> keys = new ArrayList<>();
 
@@ -692,7 +692,7 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
 
   }
 
-  //@Override
+  @Override
   public SecretBundle prepareSecretBundleResourceModel(Services services, Map<String, Object> configuration){
     DefaultSecretBundle secretBundle = new DefaultSecretBundle();
 

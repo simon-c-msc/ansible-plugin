@@ -83,11 +83,19 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
   protected String vaultFile;
   protected String vaultPassword;
 
+  protected String vaultPasswordPath;
+
   protected String baseDirectoryPath;
 
   protected String ansibleBinariesDirectoryPath;
 
   protected String extraParameters;
+
+  protected String sshAgent;
+  protected String sshPassphraseStoragePath;
+
+  protected String becamePasswordStoragePath;
+
 
   public AnsibleResourceModelSource(final Framework framework) {
       this.framework = framework;
@@ -178,7 +186,13 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
     sshPasswordPath = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_PASSWORD_STORAGE_PATH,null,configuration,executionDataContext);
     sshPrivateKeyPath = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_KEYPATH_STORAGE_PATH,null,configuration,executionDataContext);
 
+    vaultPasswordPath = (String) resolveProperty(AnsibleDescribable.ANSIBLE_VAULTSTORE_PATH,null,configuration,executionDataContext);
 
+    sshAgent = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_USE_AGENT,null,configuration,executionDataContext);
+    sshPassphraseStoragePath = (String) resolveProperty(AnsibleDescribable.ANSIBLE_SSH_PASSPHRASE,null,configuration,executionDataContext);
+    vaultPasswordPath = (String) resolveProperty(AnsibleDescribable.ANSIBLE_BECOME_PASSWORD_STORAGE_PATH,null,configuration,executionDataContext);
+
+    becamePasswordStoragePath = (String) resolveProperty(AnsibleDescribable.ANSIBLE_BECOME_PASSWORD_STORAGE_PATH,null,configuration,executionDataContext);
   }
 
   public AnsibleRunner buildAnsibleRunner() throws ResourceModelSourceException{
@@ -218,6 +232,19 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
         }
       }
 
+      if(sshAgent != null && sshAgent.equalsIgnoreCase("true")) {
+        runner = runner.sshUseAgent(Boolean.TRUE);
+
+        if(sshPassphraseStoragePath != null && !sshPassphraseStoragePath.isEmpty()) {
+          try {
+            String sshPassphrase = getStorageContentString(sshPassphraseStoragePath, storageTree);
+            runner = runner.sshPassphrase(sshPassphrase);
+          } catch (ConfigurationException e) {
+            throw new ResourceModelSourceException("Could not read passphrase from storage path " + sshPassphraseStoragePath,e);
+          }
+        }
+      }
+
     } else if ( sshAuthType.equalsIgnoreCase(AuthenticationType.password.name()) ) {
       if (sshPassword != null) {
         runner = runner.sshUsePassword(Boolean.TRUE).sshPass(sshPassword);
@@ -232,7 +259,6 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
         }
       }
     }
-
 
     if (inventory != null) {
       runner = runner.setInventory(inventory);
@@ -265,34 +291,52 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
       runner = runner.becomePassword(becomePassword);
     }
 
-      if (configFile != null) {
-        runner = runner.configFile(configFile);
+    if(becamePasswordStoragePath != null && !becamePasswordStoragePath.isEmpty()){
+      try {
+        becomePassword = getStorageContentString(becamePasswordStoragePath, storageTree);
+        runner = runner.becomePassword(becomePassword);
+      } catch (Exception e) {
+        throw new ResourceModelSourceException("Could not read becomePassword from storage path " + becamePasswordStoragePath,e);
       }
+    }
 
-      if(vaultPassword!=null) {
+    if (configFile != null) {
+      runner = runner.configFile(configFile);
+    }
+
+    if(vaultPassword!=null) {
       runner.vaultPass(vaultPassword);
-      }
+    }
 
-      if (vaultFile != null) {
-        String vaultPassword;
-        try {
-          vaultPassword = new String(Files.readAllBytes(Paths.get(vaultFile)));
-        } catch (IOException e) {
-          throw new ResourceModelSourceException("Could not read vault file " + vaultFile,e);
-        }
-        runner.vaultPass(vaultPassword);
+    if(vaultPasswordPath!=null && !vaultPasswordPath.isEmpty()){
+      try {
+        vaultPassword = getStorageContentString(vaultPasswordPath, storageTree);
+      } catch (Exception e) {
+        throw new ResourceModelSourceException("Could not read vaultPassword " + vaultPasswordPath,e);
       }
-      if (baseDirectoryPath != null) {
-	      runner.baseDirectory(baseDirectoryPath);
-      }
+      runner = runner.vaultPass(vaultPassword);
+    }
 
-      if (ansibleBinariesDirectoryPath != null) {
-        runner.ansibleBinariesDirectory(ansibleBinariesDirectoryPath);
+    if (vaultFile != null) {
+      String vaultPassword;
+      try {
+        vaultPassword = new String(Files.readAllBytes(Paths.get(vaultFile)));
+      } catch (IOException e) {
+        throw new ResourceModelSourceException("Could not read vault file " + vaultFile,e);
       }
+      runner.vaultPass(vaultPassword);
+    }
+    if (baseDirectoryPath != null) {
+        runner.baseDirectory(baseDirectoryPath);
+    }
 
-      if (extraParameters != null){
-        runner.extraParams(extraParameters);
-      }
+    if (ansibleBinariesDirectoryPath != null) {
+      runner.ansibleBinariesDirectory(ansibleBinariesDirectoryPath);
+    }
+
+    if (extraParameters != null){
+      runner.extraParams(extraParameters);
+    }
 
 
 
@@ -612,13 +656,36 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
 
     String passwordStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_SSH_PASSWORD_STORAGE_PATH);
     String privateKeyStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_SSH_KEYPATH_STORAGE_PATH);
+    String passphraseStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_SSH_PASSPHRASE);
+    String vaultPasswordStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_VAULTSTORE_PATH);
+    String becamePasswordStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_BECOME_PASSWORD_STORAGE_PATH);
 
-    if(passwordStoragePath!=null){
+    if(passwordStoragePath!=null && !passwordStoragePath.isEmpty()){
       keys.add(passwordStoragePath);
     }
 
-    if(privateKeyStoragePath!=null){
-      keys.add(privateKeyStoragePath);
+    if(privateKeyStoragePath!=null && !privateKeyStoragePath.isEmpty()){
+      if(!keys.contains(privateKeyStoragePath)){
+        keys.add(privateKeyStoragePath);
+      }
+    }
+
+    if(passphraseStoragePath!=null && !passphraseStoragePath.isEmpty()){
+      if(!keys.contains(passphraseStoragePath)){
+        keys.add(passphraseStoragePath);
+      }
+    }
+
+    if(vaultPasswordStoragePath!=null && !vaultPasswordStoragePath.isEmpty()){
+      if(!keys.contains(vaultPasswordStoragePath)){
+        keys.add(vaultPasswordStoragePath);
+      }
+    }
+
+    if(becamePasswordStoragePath!=null && !becamePasswordStoragePath.isEmpty()){
+      if(!keys.contains(becamePasswordStoragePath)){
+        keys.add(becamePasswordStoragePath);
+      }
     }
 
     return keys;
@@ -634,18 +701,42 @@ public class AnsibleResourceModelSource implements ResourceModelSource, ProxySec
 
       String passwordStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_SSH_PASSWORD_STORAGE_PATH);
       String privateKeyStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_SSH_KEYPATH_STORAGE_PATH);
+      String passphraseStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_SSH_PASSPHRASE);
+      String vaultPasswordStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_VAULTSTORE_PATH);
+      String becamePasswordStoragePath = (String) configuration.get(AnsibleDescribable.ANSIBLE_BECOME_PASSWORD_STORAGE_PATH);
 
-      if(passwordStoragePath!=null){
+      if(passwordStoragePath!=null && !passwordStoragePath.isEmpty()){
         secretBundle.addSecret(
                 passwordStoragePath,
                 getStorageContent(passwordStoragePath,storageTree )
         );
       }
 
-      if(privateKeyStoragePath!=null){
+      if(privateKeyStoragePath!=null && !privateKeyStoragePath.isEmpty()){
         secretBundle.addSecret(
                 privateKeyStoragePath,
                 getStorageContent(privateKeyStoragePath,storageTree )
+        );
+      }
+
+      if(passphraseStoragePath!=null && !passphraseStoragePath.isEmpty()){
+        secretBundle.addSecret(
+                passphraseStoragePath,
+                getStorageContent(passphraseStoragePath,storageTree )
+        );
+      }
+
+      if(vaultPasswordStoragePath!=null && !vaultPasswordStoragePath.isEmpty()){
+        secretBundle.addSecret(
+                vaultPasswordStoragePath,
+                getStorageContent(vaultPasswordStoragePath,storageTree )
+        );
+      }
+
+      if(becamePasswordStoragePath!=null && !becamePasswordStoragePath.isEmpty()){
+        secretBundle.addSecret(
+                becamePasswordStoragePath,
+                getStorageContent(becamePasswordStoragePath,storageTree )
         );
       }
 

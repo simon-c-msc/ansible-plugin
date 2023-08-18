@@ -55,6 +55,8 @@ public class AnsibleNodeExecutor implements NodeExecutor, AnsibleDescribable, Pr
         builder.property(BECOME_PASSWORD_STORAGE_PROP);
         builder.property(VAULT_KEY_FILE_PROP);
         builder.property(VAULT_KEY_STORAGE_PROP);
+        builder.mapping(ANSIBLE_BINARIES_DIR_PATH,PROJ_PROP_PREFIX + ANSIBLE_BINARIES_DIR_PATH);
+        builder.frameworkMapping(ANSIBLE_BINARIES_DIR_PATH,FWK_PROP_PREFIX + ANSIBLE_BINARIES_DIR_PATH);
         builder.mapping(ANSIBLE_EXECUTABLE,PROJ_PROP_PREFIX + ANSIBLE_EXECUTABLE);
         builder.frameworkMapping(ANSIBLE_EXECUTABLE,FWK_PROP_PREFIX + ANSIBLE_EXECUTABLE);
         builder.mapping(ANSIBLE_WINDOWS_EXECUTABLE,PROJ_PROP_PREFIX + ANSIBLE_WINDOWS_EXECUTABLE);

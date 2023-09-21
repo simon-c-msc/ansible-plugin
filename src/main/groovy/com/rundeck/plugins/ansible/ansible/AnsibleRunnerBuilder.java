@@ -693,15 +693,15 @@ public class AnsibleRunnerBuilder {
 	    Map<String, String> dataVars = dataContext.get("data");
 
 	    for(String key : optionVars.keySet()){
-	    	extraVars = extraVars + System.lineSeparator() + key + ": \"" + optionVars.get(key) + "\"";
+	    	extraVars += System.lineSeparator() + key + ": \"" + optionVars.get(key) + "\"";
 	    }
 
 	    for(String key : exportVars.keySet()){
-	    	extraVars = extraVars + System.lineSeparator() + key + ": \"" + exportVars.get(key) + "\"";
+	    	extraVars += System.lineSeparator() + key + ": \"" + exportVars.get(key) + "\"";
 	    }
 
 	    for(String key : dataVars.keySet()){
-	    	extraVars = extraVars + System.lineSeparator() + key + ": \"" + dataVars.get(key) + "\"";
+	    	extraVars += System.lineSeparator() + key + ": \"" + dataVars.get(key) + "\"";
 	    }
 		
 	// }

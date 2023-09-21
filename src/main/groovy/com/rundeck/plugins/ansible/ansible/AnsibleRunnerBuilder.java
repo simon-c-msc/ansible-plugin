@@ -692,10 +692,10 @@ public class AnsibleRunnerBuilder {
 	}
 	    
 	if(injectContextVars) {
-	    Map<String, Map<String, String>> dataContext = getContext().getDataContext();
-	    Map<String, String> optionVars = dataContext.get("option");
-	    Map<String, String> exportVars = dataContext.get("export");
-	    Map<String, String> dataVars = dataContext.get("data");
+	    // Map<String, Map<String, String>> dataContext = getContext().getDataContext();
+	    Map<String, String> optionVars = getContext().getDataContext().get("option");
+	    Map<String, String> exportVars = getContext().getDataContext().get("export");
+	    Map<String, String> dataVars = getContext().getDataContext().get("data");
 
 	    if(null == extraVarsTmp){
 		    extraVarsTmp = "";

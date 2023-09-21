@@ -677,7 +677,7 @@ public class AnsibleRunnerBuilder {
                     getjobConf()
                     );
 
-        final Boolean injectContextVars;
+        final String injectContextVars;
 	injectContextVars = PropertyResolver.resolveProperty(
                     AnsibleDescribable.ANSIBLE_INJECT_CONTEXT_VARS_AS_EXTRAVARS,
 		    null,
@@ -687,7 +687,7 @@ public class AnsibleRunnerBuilder {
                     getjobConf()
                     );
 	    
-	if(injectContextVars) {
+	if(injectContextVars == "true") {
 	    Map<String, Map<String, String>> dataContext = getContext().getDataContext();
 	    Map<String, String> optionVars = dataContext.get("option");
 	    Map<String, String> exportVars = dataContext.get("export");

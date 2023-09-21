@@ -677,7 +677,8 @@ public class AnsibleRunnerBuilder {
                     getjobConf()
                     );
 
-        injectContextVars = PropertyResolver.resolveProperty(
+        final Boolean injectContextVars;
+	injectContextVars = PropertyResolver.resolveProperty(
                     AnsibleDescribable.ANSIBLE_INJECT_CONTEXT_VARS_AS_EXTRAVARS,
 		    null,
                     getFrameworkProject(),

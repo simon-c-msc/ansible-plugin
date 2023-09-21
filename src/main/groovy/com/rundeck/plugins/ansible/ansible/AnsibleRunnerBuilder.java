@@ -685,8 +685,25 @@ public class AnsibleRunnerBuilder {
                     getNode(),
                     getjobConf()
                     );
+	    
 	if(injectContextVars) {
-	    // insert context vars in extraVars
+	    Map<String, Map<String, String>> dataContext = getContext().getDataContext();
+	    Map<String, String> optionVars = dataContext.get("option");
+	    Map<String, String> exportVars = dataContext.get("export");
+	    Map<String, String> dataVars = dataContext.get("data");
+
+	    for(String key : optionVars.keySet()){
+	    	extraVars = extraVars + System.lineSeparator() + key + ": \"" + optionVars.get(key) + "\""
+	    }
+
+	    for(String key : exportVars.keySet()){
+	    	extraVars = extraVars + System.lineSeparator() + key + ": \"" + exportVars.get(key) + "\""
+	    }
+
+	    for(String key : dataVars.keySet()){
+	    	extraVars = extraVars + System.lineSeparator() + key + ": \"" + dataVars.get(key) + "\""
+	    }
+		
 	}
 	    
 	if (null != extraVars && extraVars.contains("${")) {

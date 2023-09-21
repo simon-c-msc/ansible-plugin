@@ -692,16 +692,22 @@ public class AnsibleRunnerBuilder {
 	    Map<String, String> exportVars = dataContext.get("export");
 	    Map<String, String> dataVars = dataContext.get("data");
 
-	    for(String key : optionVars.keySet()){
-	    	extraVarsTmp += System.lineSeparator() + key + ": \"" + optionVars.get(key) + "\"";
+	    if(null != dataVars){
+		    for(String key : optionVars.keySet()){
+		    	extraVarsTmp += System.lineSeparator() + key + ": \"" + optionVars.get(key) + "\"";
+		    }
 	    }
 
-	    for(String key : exportVars.keySet()){
-	    	extraVarsTmp += System.lineSeparator() + key + ": \"" + exportVars.get(key) + "\"";
+	    if(null != exportVars){
+		    for(String key : exportVars.keySet()){
+		    	extraVarsTmp += System.lineSeparator() + key + ": \"" + exportVars.get(key) + "\"";
+		    }
 	    }
 
-	    for(String key : dataVars.keySet()){
-	    	extraVarsTmp += System.lineSeparator() + key + ": \"" + dataVars.get(key) + "\"";
+	    if(null != dataVars){
+		    for(String key : dataVars.keySet()){
+		    	extraVarsTmp += System.lineSeparator() + key + ": \"" + dataVars.get(key) + "\"";
+		    }
 	    }
 		
 	// }

@@ -677,16 +677,16 @@ public class AnsibleRunnerBuilder {
                     getjobConf()
                     );
 
-      //   injectContextVars = PropertyResolver.resolveProperty(
-      //               AnsibleDescribable.ANSIBLE_INJECT_CONTEXT_VARS_AS_EXTRAVARS,
-		    // null,
-      //               getFrameworkProject(),
-      //               getFramework(),
-      //               getNode(),
-      //               getjobConf()
-      //               );
+        injectContextVars = PropertyResolver.resolveProperty(
+                    AnsibleDescribable.ANSIBLE_INJECT_CONTEXT_VARS_AS_EXTRAVARS,
+		    null,
+                    getFrameworkProject(),
+                    getFramework(),
+                    getNode(),
+                    getjobConf()
+                    );
 	    
-	// if(injectContextVars) {
+	if(injectContextVars) {
 	    Map<String, Map<String, String>> dataContext = getContext().getDataContext();
 	    Map<String, String> optionVars = dataContext.get("option");
 	    Map<String, String> exportVars = dataContext.get("export");
@@ -714,7 +714,7 @@ public class AnsibleRunnerBuilder {
 		    }
 	    }
 		
-	// }
+	}
 
 	final String extraVars = extraVarsTmp;
 	

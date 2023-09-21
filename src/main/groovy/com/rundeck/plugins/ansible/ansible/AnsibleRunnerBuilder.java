@@ -667,8 +667,8 @@ public class AnsibleRunnerBuilder {
     }
 
     public String getExtraVars() {
-        final String extraVars;
-        extraVars = PropertyResolver.resolveProperty(
+        String extraVarsTmp;
+        extraVarsTmp = PropertyResolver.resolveProperty(
                     AnsibleDescribable.ANSIBLE_EXTRA_VARS,
                     null,
                     getFrameworkProject(),
@@ -693,19 +693,21 @@ public class AnsibleRunnerBuilder {
 	    Map<String, String> dataVars = dataContext.get("data");
 
 	    for(String key : optionVars.keySet()){
-	    	extraVars += System.lineSeparator() + key + ": \"" + optionVars.get(key) + "\"";
+	    	extraVarsTmp += System.lineSeparator() + key + ": \"" + optionVars.get(key) + "\"";
 	    }
 
 	    for(String key : exportVars.keySet()){
-	    	extraVars += System.lineSeparator() + key + ": \"" + exportVars.get(key) + "\"";
+	    	extraVarsTmp += System.lineSeparator() + key + ": \"" + exportVars.get(key) + "\"";
 	    }
 
 	    for(String key : dataVars.keySet()){
-	    	extraVars += System.lineSeparator() + key + ": \"" + dataVars.get(key) + "\"";
+	    	extraVarsTmp += System.lineSeparator() + key + ": \"" + dataVars.get(key) + "\"";
 	    }
 		
 	// }
-	    
+
+	final String extraVars = extraVarsTmp;
+	
 	if (null != extraVars && extraVars.contains("${")) {
             return DataContextUtils.replaceDataReferences(extraVars, getContext().getDataContext());
         }

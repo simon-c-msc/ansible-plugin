@@ -677,7 +677,19 @@ public class AnsibleRunnerBuilder {
                     getjobConf()
                     );
 
-        if (null != extraVars && extraVars.contains("${")) {
+        injectContextVars = PropertyResolver.resolveProperty(
+                    AnsibleDescribable.ANSIBLE_INJECT_CONTEXT_VARS_AS_EXTRAVARS,
+		    null,
+                    getFrameworkProject(),
+                    getFramework(),
+                    getNode(),
+                    getjobConf()
+                    );
+	if(injectContextVars) {
+	    // insert context vars in extraVars
+	}
+	    
+	if (null != extraVars && extraVars.contains("${")) {
             return DataContextUtils.replaceDataReferences(extraVars, getContext().getDataContext());
         }
         return extraVars;

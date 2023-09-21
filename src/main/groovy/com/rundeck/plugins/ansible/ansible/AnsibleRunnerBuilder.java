@@ -686,7 +686,7 @@ public class AnsibleRunnerBuilder {
                     getjobConf()
                     );
 	    
-	if(injectContextVars) {
+	// if(injectContextVars) {
 	    Map<String, Map<String, String>> dataContext = getContext().getDataContext();
 	    Map<String, String> optionVars = dataContext.get("option");
 	    Map<String, String> exportVars = dataContext.get("export");
@@ -704,7 +704,7 @@ public class AnsibleRunnerBuilder {
 	    	extraVars = extraVars + System.lineSeparator() + key + ": \"" + dataVars.get(key) + "\"";
 	    }
 		
-	}
+	// }
 	    
 	if (null != extraVars && extraVars.contains("${")) {
             return DataContextUtils.replaceDataReferences(extraVars, getContext().getDataContext());

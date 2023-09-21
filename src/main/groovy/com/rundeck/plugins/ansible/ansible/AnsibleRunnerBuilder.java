@@ -677,14 +677,14 @@ public class AnsibleRunnerBuilder {
                     getjobConf()
                     );
 
-        injectContextVars = PropertyResolver.resolveProperty(
-                    AnsibleDescribable.ANSIBLE_INJECT_CONTEXT_VARS_AS_EXTRAVARS,
-		    null,
-                    getFrameworkProject(),
-                    getFramework(),
-                    getNode(),
-                    getjobConf()
-                    );
+      //   injectContextVars = PropertyResolver.resolveProperty(
+      //               AnsibleDescribable.ANSIBLE_INJECT_CONTEXT_VARS_AS_EXTRAVARS,
+		    // null,
+      //               getFrameworkProject(),
+      //               getFramework(),
+      //               getNode(),
+      //               getjobConf()
+      //               );
 	    
 	// if(injectContextVars) {
 	    Map<String, Map<String, String>> dataContext = getContext().getDataContext();

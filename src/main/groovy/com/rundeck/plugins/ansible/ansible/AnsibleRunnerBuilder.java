@@ -708,12 +708,14 @@ public class AnsibleRunnerBuilder {
 	    }
 	    // extraVarsTmp += System.lineSeparator() + "data_context_context_tostring: " + getContext().getDataContext().toString();
 	    // extraVarsTmp += System.lineSeparator() + "data_context_context_object_tostring: " + getContext().getDataContextObject().toString();
-	    try{
-		    extraVarsTmp += System.lineSeparator() + "set_stats_var: " + dataContext.get("data").get("set_stats_var");
-	    } 
-	    catch (Exception e){
-		    System.out.println("Something went wrong.");
-	    }
+	    // try{
+		   //  extraVarsTmp += System.lineSeparator() + "set_stats_var: " + dataContext.get("data").get("set_stats_var");
+	    // } 
+	    // catch (Exception e){
+		   //  System.out.println("Something went wrong.");
+	    // }
+
+	    extraVarsTmp += System.lineSeparator() + "set_stats_var: ${data.set_stats_var}";
 		
 	    if(null != dataContext.get("export")){
 		    extraVarsTmp += System.lineSeparator() + "test_export: true";

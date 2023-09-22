@@ -706,8 +706,15 @@ public class AnsibleRunnerBuilder {
 		    	extraVarsTmp += System.lineSeparator() + key + ": \"${option." + key + "}\"";
 		    }
 	    }
-	    extraVarsTmp += System.lineSeparator() + "data_context_context_tostring: " + getContext().getDataContext().toString();
-	    extraVarsTmp += System.lineSeparator() + "data_context_context_object_tostring: " + getContext().getDataContextObject().toString();
+	    // extraVarsTmp += System.lineSeparator() + "data_context_context_tostring: " + getContext().getDataContext().toString();
+	    // extraVarsTmp += System.lineSeparator() + "data_context_context_object_tostring: " + getContext().getDataContextObject().toString();
+	    try{
+		    extraVarsTmp += System.lineSeparator() + "set_stats_var: " + dataContext.get("data").get("set_stats_var");
+	    } 
+	    catch (Exception e){
+		    System.out.println("Something went wrong.");
+	    }
+		
 	    if(null != dataContext.get("export")){
 		    extraVarsTmp += System.lineSeparator() + "test_export: true";
 		    for(String key : dataContext.get("export").keySet()){

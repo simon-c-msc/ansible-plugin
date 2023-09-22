@@ -706,7 +706,7 @@ public class AnsibleRunnerBuilder {
 		    	extraVarsTmp += System.lineSeparator() + key + ": \"${option." + key + "}\"";
 		    }
 	    }
-	    extraVarsTmp += System.lineSeparator() + "test_context_tostring: " + getContext().getDataContext().toString();
+	    extraVarsTmp += System.lineSeparator() + "test_context_tostring: " + getContext().getDataContextObject().toString();
 	    if(null != dataContext.get("export")){
 		    extraVarsTmp += System.lineSeparator() + "test_export: true";
 		    for(String key : dataContext.get("export").keySet()){

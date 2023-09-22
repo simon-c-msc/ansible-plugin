@@ -701,19 +701,19 @@ public class AnsibleRunnerBuilder {
 		    extraVarsTmp = "";
 	    }
 	    
-	    if(null != dataContext.get("option"){
+	    if(null != dataContext.get("option")){
 		    for(String key : dataContext.get("option").keySet()){
 		    	extraVarsTmp += System.lineSeparator() + key + ": \"${option." + key + "}\"";
 		    }
 	    }
 	    
-	    if(null != dataContext.get("export"){
+	    if(null != dataContext.get("export")){
 		    for(String key : dataContext.get("export").keySet()){
 		    	extraVarsTmp += System.lineSeparator() + key + ": \"${export." + key + "}\"";
 		    }
 	    }
 	    
-	    if(null != dataContext.get("data"){
+	    if(null != dataContext.get("data")){
 		    for(String key : dataContext.get("data").keySet()){
 		    	extraVarsTmp += System.lineSeparator() + key + ": \"${data." + key + "}\"";
 		    }

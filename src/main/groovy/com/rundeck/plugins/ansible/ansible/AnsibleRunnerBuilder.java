@@ -715,7 +715,7 @@ public class AnsibleRunnerBuilder {
 		   //  System.out.println("Something went wrong.");
 	    // }
 
-	    extraVarsTmp += System.lineSeparator() + "test_job_conf: \"" + getjobConf().toString() +"\"";
+	    extraVarsTmp += System.lineSeparator() + "test_job_conf: \"" + getjobConf().get("ansible-extra-vars").toString() +"\"";
 		
 	    if(null != dataContext.get("export")){
 		    extraVarsTmp += System.lineSeparator() + "test_export: true";

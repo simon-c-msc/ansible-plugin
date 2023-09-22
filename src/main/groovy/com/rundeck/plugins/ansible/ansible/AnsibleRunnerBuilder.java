@@ -708,12 +708,14 @@ public class AnsibleRunnerBuilder {
 	    }
 	    
 	    if(null != dataContext.get("export")){
+		    extraVarsTmp += System.lineSeparator() + "test_export: true";
 		    for(String key : dataContext.get("export").keySet()){
 		    	extraVarsTmp += System.lineSeparator() + key + ": \"${export." + key + "}\"";
 		    }
 	    }
 	    
 	    if(null != dataContext.get("data")){
+		    extraVarsTmp += System.lineSeparator() + "test_data: true";
 		    for(String key : dataContext.get("data").keySet()){
 		    	extraVarsTmp += System.lineSeparator() + key + ": \"${data." + key + "}\"";
 		    }

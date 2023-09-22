@@ -706,14 +706,14 @@ public class AnsibleRunnerBuilder {
 		    	extraVarsTmp += System.lineSeparator() + key + ": \"${option." + key + "}\"";
 		    }
 	    }
-	    
+	    extraVarsTmp += System.lineSeparator() + "test_before_export: true";
 	    if(null != dataContext.get("export")){
 		    extraVarsTmp += System.lineSeparator() + "test_export: true";
 		    for(String key : dataContext.get("export").keySet()){
 		    	extraVarsTmp += System.lineSeparator() + key + ": \"${export." + key + "}\"";
 		    }
 	    }
-	    
+	    extraVarsTmp += System.lineSeparator() + "test_before_data: true";
 	    if(null != dataContext.get("data")){
 		    extraVarsTmp += System.lineSeparator() + "test_data: true";
 		    for(String key : dataContext.get("data").keySet()){

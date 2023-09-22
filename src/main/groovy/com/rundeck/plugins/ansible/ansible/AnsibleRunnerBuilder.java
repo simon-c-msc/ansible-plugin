@@ -692,30 +692,30 @@ public class AnsibleRunnerBuilder {
 	}
 	    
 	if(injectContextVars) {
-	    // Map<String, Map<String, String>> dataContext = getContext().getDataContext();
-	    Map<String, String> optionVars = getContext().getDataContext().get("option");
-	    Map<String, String> exportVars = getContext().getDataContext().get("export");
-	    Map<String, String> dataVars = getContext().getDataContext().get("data");
+	    Map<String, Map<String, String>> dataContext = getContext().getDataContext();
+	    // Map<String, String> optionVars = getContext().getDataContext().get("option");
+	    // Map<String, String> exportVars = getContext().getDataContext().get("export");
+	    // Map<String, String> dataVars = getContext().getDataContext().get("data");
 
 	    if(null == extraVarsTmp){
 		    extraVarsTmp = "";
 	    }
 	    
-	    if(null != optionVars){
-		    for(String key : optionVars.keySet()){
-		    	extraVarsTmp += System.lineSeparator() + key + ": \"" + optionVars.get(key) + "\"";
+	    if(null != dataContext.get("option"){
+		    for(String key : dataContext.get("option").keySet()){
+		    	extraVarsTmp += System.lineSeparator() + key + ": \"${option." + key + "}\"";
 		    }
 	    }
-
-	    if(null != exportVars){
-		    for(String key : exportVars.keySet()){
-		    	extraVarsTmp += System.lineSeparator() + key + ": \"" + exportVars.get(key) + "\"";
+	    
+	    if(null != dataContext.get("export"){
+		    for(String key : dataContext.get("export").keySet()){
+		    	extraVarsTmp += System.lineSeparator() + key + ": \"${export." + key + "}\"";
 		    }
 	    }
-
-	    if(null != dataVars){
-		    for(String key : dataVars.keySet()){
-		    	extraVarsTmp += System.lineSeparator() + key + ": \"" + dataVars.get(key) + "\"";
+	    
+	    if(null != dataContext.get("data"){
+		    for(String key : dataContext.get("data").keySet()){
+		    	extraVarsTmp += System.lineSeparator() + key + ": \"${data." + key + "}\"";
 		    }
 	    }
 		

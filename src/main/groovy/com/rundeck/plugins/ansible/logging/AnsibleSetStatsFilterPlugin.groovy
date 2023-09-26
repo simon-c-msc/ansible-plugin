@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.rundeck.plugins.ansible.plugin
+package com.rundeck.plugins.ansible.logging
 
 import com.dtolabs.rundeck.core.execution.workflow.OutputContext
 import com.dtolabs.rundeck.core.logging.LogEventControl

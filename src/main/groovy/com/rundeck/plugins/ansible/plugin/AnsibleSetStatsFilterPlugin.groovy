@@ -45,6 +45,9 @@ import com.google.gson.JsonElement
  * @since 20/09/2023
  */
 
+@Plugin(name = "ansible-set-stats", service = "LogFilter")
+@PluginDescription(title = "Ansible set_stats", description = "Captures simple Key/Value data from the output of the ansible set_stats module.")
+
 rundeckPlugin(LogFilterPlugin){
     title = "Ansible set_stats"
     description = "Captures simple Key/Value data from the output of the ansible set_stats module."

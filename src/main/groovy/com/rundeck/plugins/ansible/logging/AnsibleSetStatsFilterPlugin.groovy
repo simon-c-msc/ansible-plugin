@@ -44,22 +44,24 @@ import com.google.gson.JsonElement
  * @author Simon Cateau
  * @since 20/09/2023
  */
+@Plugin(name = "ansible-set-stats", service = "LogFilter")
+@PluginDescription(title = "Ansible set_stats", description = "Captures simple Key/Value data from the output of the ansible set_stats module.")
 
-rundeckPlugin(LogFilterPlugin){
-    title = "Ansible set_stats"
-    description = "Captures simple Key/Value data from the output of the ansible set_stats module."
-    version = "0.0.1"
-
-    configuration {
-        outputData (title: "Log Data", description: "If true, log the captured data", defaultValue: 'false', type: 'Boolean')
-    }
+class AnsibleSetStatsFilterPlugin implements LogFilterPlugin{
+    @PluginProperty(
+        title = "Log Data",
+        description = "If true, log the captured data",
+        defaultValue = 'false'
+    )
+    Boolean outputData
 
     Pattern setStatsGlobalPattern
     OutputContext outputContext
     Map<String, String> allData
     ObjectMapper mapper
 
-    init { PluginLoggingContext context, Map configuration ->
+    @Override
+    void init(final PluginLoggingContext context) {
         String regex = /^\tRUN:\s(\{.*\})$/
         setStatsGlobalPattern = Pattern.compile(regex)
         outputContext = context.getOutputContext()
@@ -67,7 +69,8 @@ rundeckPlugin(LogFilterPlugin){
         allData = [:]
     }
 
-    handleEvent { PluginLoggingContext context, LogEventControl event, Map configuration ->
+    @Override
+    void handleEvent(final PluginLoggingContext context, final LogEventControl event) {
         if (event.eventType == 'log' && event.loglevel == LogLevel.NORMAL && event.message?.length() > 0) {
             Matcher match = setStatsGlobalPattern.matcher(event.message)
 
@@ -85,9 +88,10 @@ rundeckPlugin(LogFilterPlugin){
         }
     }
 
-    complete { PluginLoggingContext context, Map configuration ->
+    @Override
+    void complete(final PluginLoggingContext context) {
         if (allData) {
-            if (configuration.outputData == 'true') {
+            if (outputData) {
                 context.log(
                         2,
                         mapper.writeValueAsString(allData),
@@ -97,8 +101,65 @@ rundeckPlugin(LogFilterPlugin){
                         ]
                 )
             }
-            allData = [:]
+            // allData = [:]
         }
     }
-
 }
+                   
+// rundeckPlugin(LogFilterPlugin){
+//     title = "Ansible set_stats"
+//     description = "Captures simple Key/Value data from the output of the ansible set_stats module."
+//     version = "0.0.1"
+
+//     configuration {
+//         outputData (title: "Log Data", description: "If true, log the captured data", defaultValue: 'false', type: 'Boolean')
+//     }
+
+//     Pattern setStatsGlobalPattern
+//     OutputContext outputContext
+//     Map<String, String> allData
+//     ObjectMapper mapper
+
+//     init { PluginLoggingContext context, Map configuration ->
+//         String regex = /^\tRUN:\s(\{.*\})$/
+//         setStatsGlobalPattern = Pattern.compile(regex)
+//         outputContext = context.getOutputContext()
+//         mapper = new ObjectMapper()
+//         allData = [:]
+//     }
+
+//     handleEvent { PluginLoggingContext context, LogEventControl event, Map configuration ->
+//         if (event.eventType == 'log' && event.loglevel == LogLevel.NORMAL && event.message?.length() > 0) {
+//             Matcher match = setStatsGlobalPattern.matcher(event.message)
+
+//             if(match.matches()){
+//                 String jsonString = match.group(1)
+//                 JsonObject obj = JsonParser.parseString(jsonString).getAsJsonObject()
+//                 Iterator<String> keys = obj.keySet().iterator()
+//                 while(keys.hasNext()) {
+//                         String key = keys.next()
+//                         String value =  obj.get(key).getAsString()
+//                         allData[key] = value
+//                         outputContext.addOutput("data", key, value)
+//                 }
+//             }
+//         }
+//     }
+
+//     complete { PluginLoggingContext context, Map configuration ->
+//         if (allData) {
+//             if (configuration.outputData == 'true') {
+//                 context.log(
+//                         2,
+//                         mapper.writeValueAsString(allData),
+//                         [
+//                                 'content-data-type'       : 'application/json',
+//                                 'content-meta:table-title': 'Ansible set_stats: Results'
+//                         ]
+//                 )
+//             }
+//             allData = [:]
+//         }
+//     }
+
+// }

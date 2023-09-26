@@ -34,8 +34,12 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 
-import org.grails.web.json.JSONObject
 import java.util.Iterator
+import com.google.gson.Gson
+import com.google.gson.Gson.JsonParser
+import com.google.gson.Gson.JsonObject
+import com.google.gson.Gson.JsonElement
+
 
 /**
  * @author Simon Cateau
@@ -70,13 +74,13 @@ rundeckPlugin(LogFilterPlugin){
 
             if(match.matches()){
                 String jsonString = match.group(1)
-                JSONObject obj = new JSONObject(jsonString)
-                Iterator<String> keys = obj.keys();
+                JsonObject obj = JsonParser.parseString(jsonString).getAsJsonObject()
+                Iterator<String> keys = obj.keySet().iterator()
                 while(keys.hasNext()) {
                         String key = keys.next()
-                        Object value = obj.get(key)
-                        allData[key] = value.toString()
-                        outputContext.addOutput("data", key, value.toString())
+                        String value =  obj.get(key).getAsString()
+                        allData[key] = value
+                        outputContext.addOutput("data", key, value)
                 }
             }
         }

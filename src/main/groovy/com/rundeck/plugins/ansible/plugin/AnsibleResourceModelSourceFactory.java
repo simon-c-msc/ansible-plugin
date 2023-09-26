@@ -9,6 +9,7 @@ import com.dtolabs.rundeck.core.resources.ResourceModelSource;
 import com.dtolabs.rundeck.core.resources.ResourceModelSourceFactory;
 import com.dtolabs.rundeck.plugins.ServiceNameConstants;
 import com.dtolabs.rundeck.plugins.util.DescriptionBuilder;
+import org.rundeck.app.spi.Services;
 
 import java.util.Properties;
 
@@ -53,6 +54,15 @@ public class AnsibleResourceModelSourceFactory implements ResourceModelSourceFac
         builder.property(BECOME_PASSWORD_PROP);
         builder.property(VAULT_KEY_FILE_PROP);
         builder.property(VAULT_PASSWORD_PROP);
+        builder.property(VAULT_KEY_STORAGE_PROP);
+
+        builder.property(SSH_PASSWORD_STORAGE_PROP);
+        builder.property(SSH_KEY_STORAGE_PROP);
+        builder.property(SSH_PASSPHRASE);
+
+        builder.property(SSH_USE_AGENT);
+        builder.property(BECOME_PASSWORD_STORAGE_PROP);
+
         builder.mapping(ANSIBLE_INVENTORY,PROJ_PROP_PREFIX + ANSIBLE_INVENTORY);
         builder.frameworkMapping(ANSIBLE_INVENTORY,FWK_PROP_PREFIX + ANSIBLE_INVENTORY);
         builder.mapping(ANSIBLE_CONFIG_FILE_PATH,PROJ_PROP_PREFIX + ANSIBLE_CONFIG_FILE_PATH);
@@ -68,12 +78,18 @@ public class AnsibleResourceModelSourceFactory implements ResourceModelSourceFac
 
   @Override
   public ResourceModelSource createResourceModelSource(Properties configuration) throws ConfigurationException {
-    AnsibleResourceModelSource ansibleResourceModelSource = new AnsibleResourceModelSource(framework);
-    ansibleResourceModelSource.configure(configuration);
-    return ansibleResourceModelSource;
+    return null;
   }
 
-  @Override
+    @Override
+    public ResourceModelSource createResourceModelSource(Services services, Properties configuration) throws ConfigurationException {
+        AnsibleResourceModelSource ansibleResourceModelSource = new AnsibleResourceModelSource(framework);
+        ansibleResourceModelSource.configure(configuration);
+        ansibleResourceModelSource.setServices(services);
+        return ansibleResourceModelSource;
+    }
+
+    @Override
   public Description getDescription() {
         return DESC;
   }

@@ -48,6 +48,7 @@ dependencies {
   pluginLibs 'com.google.code.gson:gson:2.10.1'
   implementation('org.rundeck:rundeck-core:4.16.0-rc1-20230815')
   implementation 'org.codehaus.groovy:groovy-all:3.0.9'
+  implementation 'org.json:json:20230618'
 }
 
 task copyToLib(type: Copy) {

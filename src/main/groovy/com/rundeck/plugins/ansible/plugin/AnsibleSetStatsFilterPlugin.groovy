@@ -35,10 +35,9 @@ import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 
 import java.util.Iterator
-import com.google.gson.Gson
-import com.google.gson.Gson.JsonParser
-import com.google.gson.Gson.JsonObject
-import com.google.gson.Gson.JsonElement
+import com.google.gson.JsonParser
+import com.google.gson.JsonObject
+import com.google.gson.JsonElement
 
 
 /**

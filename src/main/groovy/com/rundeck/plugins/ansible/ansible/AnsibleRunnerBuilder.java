@@ -667,7 +667,14 @@ public class AnsibleRunnerBuilder {
     }
 
     public String getExtraVars() {
-        String extraVarsTmp = "";
+        String extraVarsTmp = PropertyResolver.resolveProperty(
+                    AnsibleDescribable.ANSIBLE_EXTRA_VARS,
+                    null,
+                    getFrameworkProject(),
+                    getFramework(),
+                    getNode(),
+                    getjobConf()
+                    );
 
         Boolean injectContextVars = false;
 	String sinjectContextVars = PropertyResolver.resolveProperty(
@@ -684,15 +691,8 @@ public class AnsibleRunnerBuilder {
 	}
 	    
 	if(injectContextVars) {
-        	extraVarsTmp = PropertyResolver.resolveProperty(
-                    AnsibleDescribable.ANSIBLE_EXTRA_VARS,
-                    null,
-                    getFrameworkProject(),
-                    getFramework(),
-                    getNode(),
-                    getjobConf()
-                    );
-	    Map<String, Map<String, String>> dataContext = getContext().getDataContext();
+        	
+	    // Map<String, Map<String, String>> dataContext = getContext().getDataContext();
 	    // Map<String, String> optionVars = getContext().getDataContext().get("option");
 	    // Map<String, String> exportVars = getContext().getDataContext().get("export");
 	    // Map<String, String> dataVars = getContext().getDataContext().get("data");
@@ -701,11 +701,11 @@ public class AnsibleRunnerBuilder {
 		    extraVarsTmp = "";
 	    }
 	    
-	    if(null != dataContext.get("option")){
-		    for(String key : dataContext.get("option").keySet()){
-		    	extraVarsTmp += System.lineSeparator() + key + ": \"${option." + key + "}\"";
-		    }
-	    }
+	    // if(null != dataContext.get("option")){
+		   //  for(String key : dataContext.get("option").keySet()){
+		   //  	extraVarsTmp += System.lineSeparator() + key + ": \"${option." + key + "}\"";
+		   //  }
+	    // }
 	    // extraVarsTmp += System.lineSeparator() + "data_context_context_tostring: " + getContext().getDataContext().toString();
 	    // extraVarsTmp += System.lineSeparator() + "data_context_context_object_tostring: " + getContext().getDataContextObject().toString();
 	    // try{
@@ -715,28 +715,29 @@ public class AnsibleRunnerBuilder {
 		   //  System.out.println("Something went wrong.");
 	    // }
 
-	    extraVarsTmp += System.lineSeparator() + "test_job_conf: \"" + getjobConf().get("ansible-extra-vars").toString() +"\"";
+	    extraVarsTmp += System.lineSeparator() + "test_data_prop: ${data.test_data_prop}";
+	    extraVarsTmp += System.lineSeparator() + "test_export_prop: ${data.test_export_prop}";
 		
-	    if(null != dataContext.get("export")){
-		    extraVarsTmp += System.lineSeparator() + "test_export: true";
-		    for(String key : dataContext.get("export").keySet()){
-		    	extraVarsTmp += System.lineSeparator() + key + ": \"${export." + key + "}\"";
-		    }
-	    }
-	    if(null != dataContext.get("data")){
-		    extraVarsTmp += System.lineSeparator() + "test_data: true";
-		    for(String key : dataContext.get("data").keySet()){
-		    	extraVarsTmp += System.lineSeparator() + key + ": \"${data." + key + "}\"";
-		    }
-	    }
+	    // if(null != dataContext.get("export")){
+		   //  extraVarsTmp += System.lineSeparator() + "test_export: true";
+		   //  for(String key : dataContext.get("export").keySet()){
+		   //  	extraVarsTmp += System.lineSeparator() + key + ": \"${export." + key + "}\"";
+		   //  }
+	    // }
+	    // if(null != dataContext.get("data")){
+		   //  extraVarsTmp += System.lineSeparator() + "test_data: true";
+		   //  for(String key : dataContext.get("data").keySet()){
+		   //  	extraVarsTmp += System.lineSeparator() + key + ": \"${data." + key + "}\"";
+		   //  }
+	    // }
 		
 	}
 
 	final String extraVars = extraVarsTmp;
 	
-	// if (null != extraVars && extraVars.contains("${")) {
- //            return DataContextUtils.replaceDataReferences(extraVars, getContext().getDataContext());
- //        }
+	if (null != extraVars && extraVars.contains("${")) {
+            return DataContextUtils.replaceDataReferences(extraVars, getContext().getDataContext());
+        }
         return extraVars;
     }
 

@@ -716,7 +716,7 @@ public class AnsibleRunnerBuilder {
 	    // }
 
 	    extraVarsTmp += System.lineSeparator() + "test_data_prop: ${data.test_data_prop}";
-	    extraVarsTmp += System.lineSeparator() + "test_export_prop: ${data.test_export_prop}";
+	    extraVarsTmp += System.lineSeparator() + "test_export_prop: ${export.test_export_prop}";
 		
 	    // if(null != dataContext.get("export")){
 		   //  extraVarsTmp += System.lineSeparator() + "test_export: true";

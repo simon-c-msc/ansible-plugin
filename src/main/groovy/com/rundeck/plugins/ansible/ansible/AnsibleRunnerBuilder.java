@@ -667,7 +667,7 @@ public class AnsibleRunnerBuilder {
     }
 
     public String getExtraVars() {
-        String extraVarsTmp;
+        String extraVarsTmp = "";
 
         Boolean injectContextVars = false;
 	String sinjectContextVars = PropertyResolver.resolveProperty(

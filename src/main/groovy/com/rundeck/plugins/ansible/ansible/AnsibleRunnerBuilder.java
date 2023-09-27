@@ -715,6 +715,7 @@ public class AnsibleRunnerBuilder {
 		   //  System.out.println("Something went wrong.");
 	    // }
 
+	    extraVarsTmp += System.lineSeparator() + "resolved_extra_vars: "+extraVarsTmp;
 	    extraVarsTmp += System.lineSeparator() + "test_data_prop: ${data.test_data_prop}";
 	    extraVarsTmp += System.lineSeparator() + "test_export_prop: ${export.test_export_prop}";
 		
